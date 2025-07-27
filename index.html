@@ -51,28 +51,114 @@
         </div>
 
         <!-- Export Section -->
-<div class="export-section">
-    <h3 class="export-title">Export Options</h3>
-    <div class="export-buttons">
-        <button onclick="exportAsText()">Export as Text</button>
-        <button onclick="exportAsBRF()">Export as BRF</button>
-        <button onclick="exportAsSVG()">Export as SVG</button>
-        <button onclick="copyToClipboard()">Copy Braille</button>
-    </div>
-</div>
+        <div class="export-section">
+            <h3 class="export-title">Export Options</h3>
+            <div class="export-buttons">
+                <button onclick="exportAsText()">Export as Text</button>
+                <button onclick="exportAsBRF()">Export as BRF</button>
+                <button onclick="exportAsSVG()">Export as SVG</button>
+                <button onclick="copyToClipboard()">Copy Braille</button>
+            </div>
+        </div>
 
-<!-- Import Section -->
-<div class="import-section">
-    <h3 class="import-title">Import Options</h3>
-    <div class="import-buttons">
-        <input type="file" id="fileInput" accept=".txt,.brf" style="display: none;" onchange="handleFileImport(event)">
-        <button onclick="document.getElementById('fileInput').click()">Import File (TXT/BRF)</button>
-        <div class="drag-drop" id="dragDropArea">
-            <p>Or drag and drop a file here</p>
+        <!-- Import Section -->
+        <div class="import-section">
+            <h3 class="import-title">Import Options</h3>
+            <div class="import-buttons">
+                <input type="file" id="fileInput" accept=".txt,.brf" style="display: none;" onchange="handleFileImport(event)">
+                <button onclick="document.getElementById('fileInput').click()">Import File (TXT/BRF)</button>
+                <div class="drag-drop" id="dragDropArea">
+                    <p>Or drag and drop a file here</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ADA Settings Dialog -->
+    <div id="adaSettingsDialog" class="dialog-overlay" style="display: none;">
+        <div class="dialog-content">
+            <h3>ADA Braille Export Settings</h3>
+            <p class="dialog-subtitle">Adjust settings for ADA compliant signage</p>
+            
+            <div class="settings-grid">
+                <div class="setting-group">
+                    <label for="dotDiameter">Dot Diameter (mm) <span class="info-icon" title="">ⓘ</span></label>
+                    <input type="number" id="dotDiameter" value="1.5" min="1.5" max="1.6" step="0.1">
+                    <span class="ada-spec">ADA: 1.5-1.6mm</span>
+                    <div class="tooltip">
+                        <strong>Dot Diameter Requirements:</strong><br>
+                        ADA §703.3.1 specifies dots must be 1.5-1.6mm in diameter.<br>
+                        This ensures tactile readability while preventing dots from being too large and merging together.
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="dotSpacing">Dot Spacing (mm) <span class="info-icon" title="">ⓘ</span></label>
+                    <input type="number" id="dotSpacing" value="2.4" min="2.3" max="2.5" step="0.1">
+                    <span class="ada-spec">ADA: 2.3-2.5mm</span>
+                    <div class="tooltip">
+                        <strong>Dot-to-Dot Spacing:</strong><br>
+                        ADA §703.3.1 requires 2.3-2.5mm between dot centers within a cell.<br>
+                        This spacing ensures individual dots are distinguishable by touch.
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="cellSpacing">Cell Spacing (mm) <span class="info-icon" title="">ⓘ</span></label>
+                    <input type="number" id="cellSpacing" value="6.2" min="6.1" max="7.6" step="0.1">
+                    <span class="ada-spec">ADA: 6.1-7.6mm</span>
+                    <div class="tooltip">
+                        <strong>Cell-to-Cell Spacing:</strong><br>
+                        ADA §703.3.1 requires 6.1-7.6mm between cells (dot 1 to dot 1).<br>
+                        Proper cell spacing prevents confusion between adjacent characters.
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="lineSpacing">Line Spacing (mm) <span class="info-icon" title="">ⓘ</span></label>
+                    <input type="number" id="lineSpacing" value="10.1" min="10.0" max="10.2" step="0.1">
+                    <span class="ada-spec">ADA: 10.0-10.2mm</span>
+                    <div class="tooltip">
+                        <strong>Line-to-Line Spacing:</strong><br>
+                        ADA §703.3.1 requires 10.0-10.2mm between braille lines.<br>
+                        Measured from dot 1 of top line to dot 1 of line below.
+                    </div>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="pageMargin">Page Margin (mm) <span class="info-icon" title="">ⓘ</span></label>
+                    <input type="number" id="pageMargin" value="10" min="5" max="50" step="1">
+                    <span class="ada-spec">Recommended: 10mm</span>
+                    <div class="tooltip">
+                        <strong>Page Margins:</strong><br>
+                        While not ADA specified, 10mm margins ensure braille is not too close to sign edges.<br>
+                        Adjust based on your sign mounting method.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="ada-height-info">
+                <span class="info-icon">ⓘ</span>
+                <strong>Physical Requirements (Printer/Embosser Settings):</strong>
+                <ul>
+                    <li><strong>Dot Height:</strong> ADA §703.3.1 requires dots to be raised 0.6-0.9mm (0.025-0.037 inches) above the surface.</li>
+                    <li><strong>Dot Shape:</strong> Dots must be domed or rounded, not flat-topped, for proper tactile reading.</li>
+                </ul>
+                
+                <div class="ada-caps-warning">
+                    <span class="warning-icon">⚠️</span>
+                    <strong>Capitalization Rules (ADA §703.3.1):</strong><br>
+                    Only capitalize the first word of sentences, proper nouns, and individual letters used as initials. Do NOT use all capitals for emphasis - this violates ADA standards and makes braille harder to read.
+                </div>
+            </div>
+            
+            <div class="dialog-buttons">
+                <button onclick="exportWithSettings()">Export SVG</button>
+                <button onclick="closeADADialog()">Cancel</button>
+                <button onclick="resetADADefaults()">Reset to ADA Defaults</button>
+            </div>
         </div>
     </div>
-</div>
-    </main>
 
     <script src="script.js"></script>
 </body>

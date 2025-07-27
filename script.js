@@ -299,6 +299,8 @@ function toggleView(view) {
     }
 }
 
+
+
 function drawDotPattern() {
     const canvas = document.getElementById('dotsCanvas');
     const ctx = canvas.getContext('2d');
@@ -311,10 +313,22 @@ function drawDotPattern() {
     
     // Settings
     const cellWidth = 40;
-    const cellHeight = 60;
-    const dotRadius = 4;
+    const cellHeight = 50;
+    const dotRadius = 3;
     const padding = 20;
-    const lineSpacing = 20;
+    const lineSpacing = 25;
+    
+    // Correct dot position mapping for standard braille numbering
+    const dotPositions = {
+        1: {col: 0, row: 0},  // Top left
+        2: {col: 0, row: 1},  // Middle left
+        3: {col: 0, row: 2},  // Bottom left
+        4: {col: 1, row: 0},  // Top right
+        5: {col: 1, row: 1},  // Middle right
+        6: {col: 1, row: 2},  // Bottom right
+        7: {col: 0, row: 3},  // Extension dot left (8-dot braille)
+        8: {col: 1, row: 3}   // Extension dot right (8-dot braille)
+    };
     
     // Calculate dimensions
     const charsPerLine = Math.floor((canvas.parentElement.offsetWidth - 2 * padding) / cellWidth);
@@ -333,12 +347,24 @@ function drawDotPattern() {
     if (currentLine) lines.push(currentLine);
     
     // Set canvas size
-    canvas.width = canvas.parentElement.offsetWidth;
-    canvas.height = lines.length * (cellHeight + lineSpacing) + 2 * padding;
+    const targetWidth = canvas.parentElement.offsetWidth;
+    const targetHeight = lines.length * (cellHeight + lineSpacing) + 2 * padding;
+
+    // Get device pixel ratio for high DPI displays
+    const dpr = window.devicePixelRatio || 1;
+
+    // Set both the canvas internal size AND the CSS size
+    canvas.width = targetWidth * dpr;
+    canvas.height = targetHeight * dpr;
+    canvas.style.width = targetWidth + 'px';
+    canvas.style.height = targetHeight + 'px';
+
+    // Scale the drawing context to match device pixel ratio
+    ctx.scale(dpr, dpr);
     
     // Clear canvas
     ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-tertiary');
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
     
     // Draw each line
     lines.forEach((line, lineIndex) => {
@@ -353,11 +379,10 @@ function drawDotPattern() {
             ctx.strokeRect(x, y, cellWidth - 5, cellHeight);
             
             // Draw all 6 dot positions (faint)
-            for (let dotPos = 1; dotPos <= 6; dotPos++) {
-                const col = (dotPos - 1) % 2;
-                const row = Math.floor((dotPos - 1) / 2);
-                const dotX = x + 10 + col * 15;
-                const dotY = y + 10 + row * 15;
+            for (let dotNum = 1; dotNum <= 6; dotNum++) {
+                const pos = dotPositions[dotNum];
+                const dotX = x + 12 + pos.col * 16;
+                const dotY = y + 10 + pos.row * 14;
                 
                 ctx.fillStyle = '#333';
                 ctx.beginPath();
@@ -366,21 +391,22 @@ function drawDotPattern() {
             }
             
             // Draw active dots
-            dots.forEach(dotPos => {
-                const col = (dotPos - 1) % 2;
-                const row = Math.floor((dotPos - 1) / 2);
-                const dotX = x + 10 + col * 15;
-                const dotY = y + 10 + row * 15;
+            dots.forEach(dotNum => {
+                const pos = dotPositions[dotNum];
+                if (!pos) return;
+                
+                const dotX = x + 12 + pos.col * 16;
+                const dotY = y + 10 + pos.row * 14;
                 
                 // Glow effect
-                const gradient = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, dotRadius * 2);
+                const gradient = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, dotRadius * 1.5);
                 gradient.addColorStop(0, '#00d4ff');
                 gradient.addColorStop(0.5, '#00a8cc');
                 gradient.addColorStop(1, 'transparent');
                 
                 ctx.fillStyle = gradient;
                 ctx.beginPath();
-                ctx.arc(dotX, dotY, dotRadius * 2, 0, Math.PI * 2);
+                ctx.arc(dotX, dotY, dotRadius * 1.5, 0, Math.PI * 2);
                 ctx.fill();
                 
                 // Main dot
@@ -392,6 +418,71 @@ function drawDotPattern() {
         }
     });
 }
+
+// Add fullscreen/popup functionality
+function toggleFullscreen(elementId) {
+    const element = document.getElementById(elementId);
+    const isInput = elementId === 'inputText';
+    
+    if (element.classList.contains('fullscreen')) {
+        // Exit fullscreen
+        element.classList.remove('fullscreen');
+        document.body.style.overflow = 'auto';
+        
+        // Remove close button
+        const closeBtn = element.parentElement.querySelector('.fullscreen-close');
+        if (closeBtn) closeBtn.remove();
+    } else {
+        // Enter fullscreen
+        element.classList.add('fullscreen');
+        document.body.style.overflow = 'hidden';
+        
+        // Add close button
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'fullscreen-close';
+        closeBtn.innerHTML = '×';
+        closeBtn.onclick = () => toggleFullscreen(elementId);
+        element.parentElement.appendChild(closeBtn);
+        
+        // Focus the element
+        if (isInput) element.focus();
+        
+        // If it's the dots canvas, redraw it
+        if (elementId === 'dotsCanvas') {
+            setTimeout(() => drawDotPattern(), 100);
+        }
+    }
+}
+
+// Add expand buttons to panels
+document.addEventListener('DOMContentLoaded', function() {
+    // Add expand button to input panel
+    const inputPanel = document.querySelector('#inputText').parentElement;
+    const inputExpandBtn = document.createElement('button');
+    inputExpandBtn.className = 'expand-btn';
+    inputExpandBtn.innerHTML = '⛶';
+    inputExpandBtn.title = 'Expand';
+    inputExpandBtn.onclick = () => toggleFullscreen('inputText');
+    inputPanel.querySelector('.panel-header').appendChild(inputExpandBtn);
+    
+    // Add expand button to output panel
+    const outputPanel = document.querySelector('#brailleOutput').parentElement;
+    const outputExpandBtn = document.createElement('button');
+    outputExpandBtn.className = 'expand-btn';
+    outputExpandBtn.innerHTML = '⛶';
+    outputExpandBtn.title = 'Expand';
+    outputExpandBtn.onclick = () => {
+        if (currentView === 'unicode') {
+            toggleFullscreen('brailleOutput');
+        } else {
+            toggleFullscreen('dotsCanvas');
+        }
+    };
+    outputPanel.querySelector('.panel-header').appendChild(outputExpandBtn);
+});
+
+
+// Add expand buttons to panels
 
 // Export functions
 function exportAsText() {
@@ -512,33 +603,72 @@ function exportAsBRF() {
     URL.revokeObjectURL(url);
 }
 
-// SVG Export for ADA signage
+// Show ADA settings dialog
 function exportAsSVG() {
     const output = document.getElementById('brailleOutput').textContent;
-    const input = document.getElementById('inputText').value;
-    
     if (!output) {
         alert('Nothing to export! Please translate some text first.');
         return;
     }
     
-    // ADA compliant dimensions (in mm, converted to pixels at 96 DPI)
-    const dotDiameter = 1.5; // mm
-    const dotHeight = 0.8; // mm (for visual representation)
-    const dotSpacing = 2.5; // mm between dot centers
-    const cellWidth = 6.2; // mm
-    const cellHeight = 10; // mm
-    const mmToPx = 3.78; // conversion factor
+    // Show the dialog
+    document.getElementById('adaSettingsDialog').style.display = 'flex';
+}
+
+// Close ADA dialog
+function closeADADialog() {
+    document.getElementById('adaSettingsDialog').style.display = 'none';
+}
+
+// Reset to ADA defaults
+function resetADADefaults() {
+    document.getElementById('dotDiameter').value = '1.5';
+    document.getElementById('dotSpacing').value = '2.4';
+    document.getElementById('cellSpacing').value = '6.2';
+    document.getElementById('lineSpacing').value = '10.1';
+    document.getElementById('pageMargin').value = '10';
+}
+
+// Export with custom settings
+function exportWithSettings() {
+    const output = document.getElementById('brailleOutput').textContent;
+    const input = document.getElementById('inputText').value;
+    
+    // Get settings from dialog
+    const settings = {
+        dotDiameter: parseFloat(document.getElementById('dotDiameter').value),
+        dotSpacing: parseFloat(document.getElementById('dotSpacing').value),
+        cellSpacing: parseFloat(document.getElementById('cellSpacing').value),
+        lineSpacing: parseFloat(document.getElementById('lineSpacing').value),
+        pageMargin: parseFloat(document.getElementById('pageMargin').value),
+        mmToPx: 3.78  // 96 DPI
+    };
     
     const lines = output.split('\n');
     const maxLineLength = Math.max(...lines.map(line => line.length));
     
-    const svgWidth = Math.ceil((maxLineLength * cellWidth + 20) * mmToPx);
-    const svgHeight = Math.ceil((lines.length * cellHeight + 20) * mmToPx);
+    const svgWidth = Math.ceil((maxLineLength * settings.cellSpacing + 2 * settings.pageMargin) * settings.mmToPx);
+    const svgHeight = Math.ceil((lines.length * settings.lineSpacing + 2 * settings.pageMargin) * settings.mmToPx);
+    
+    // Correct dot position mapping
+    const dotPositions = {
+        1: {col: 0, row: 0},
+        2: {col: 0, row: 1},
+        3: {col: 0, row: 2},
+        4: {col: 1, row: 0},
+        5: {col: 1, row: 1},
+        6: {col: 1, row: 2}
+    };
     
     let svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}">
-  <!-- ADA Compliant Braille for: ${input} -->
+  <!-- ADA Compliant Braille for: ${input}
+       Dot Diameter: ${settings.dotDiameter}mm
+       Dot Spacing: ${settings.dotSpacing}mm  
+       Cell Spacing: ${settings.cellSpacing}mm
+       Line Spacing: ${settings.lineSpacing}mm
+       Page Margin: ${settings.pageMargin}mm
+  -->
   <rect width="${svgWidth}" height="${svgHeight}" fill="white"/>
   <g id="braille-dots" fill="black">`;
     
@@ -547,13 +677,16 @@ function exportAsSVG() {
             const char = line[charIndex];
             const dots = brailleDotMap[char] || [];
             
-            dots.forEach(dotPos => {
-                const col = (dotPos - 1) % 2;
-                const row = Math.floor((dotPos - 1) / 2);
+            dots.forEach(dotNum => {
+                const pos = dotPositions[dotNum];
+                if (!pos) return;
                 
-                const cx = (10 + charIndex * cellWidth + col * dotSpacing) * mmToPx;
-                const cy = (10 + lineIndex * cellHeight + row * dotSpacing) * mmToPx;
-                const r = (dotDiameter / 2) * mmToPx;
+                const cellX = settings.pageMargin + charIndex * settings.cellSpacing;
+                const cellY = settings.pageMargin + lineIndex * settings.lineSpacing;
+                
+                const cx = (cellX + pos.col * settings.dotSpacing) * settings.mmToPx;
+                const cy = (cellY + pos.row * settings.dotSpacing) * settings.mmToPx;
+                const r = (settings.dotDiameter / 2) * settings.mmToPx;
                 
                 svg += `\n    <circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${r.toFixed(2)}"/>`;
             });
@@ -572,9 +705,13 @@ function exportAsSVG() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    
+    // Close dialog
+    closeADADialog();
 }
 
-// File Import Handler
+
+// Fixed File Import Handler
 function handleFileImport(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -601,21 +738,75 @@ function handleFileImport(event) {
                 "'": '⠘', '"': '⠈', '-': '⠐', ' ': ' ', '\n': '\n'
             };
             
+            // Also create reverse mapping for back-translation
+            const unicodeToBRF = {};
+            for (let [brf, unicode] of Object.entries(brfToUnicode)) {
+                unicodeToBRF[unicode] = brf;
+            }
+            
+            // Convert BRF to Unicode for display
             let unicodeText = '';
             for (let char of content) {
                 unicodeText += brfToUnicode[char] || char;
             }
             
+            // Try to back-translate to regular text for the input field
+            let plainText = '';
+            let inNumber = false;
+            
+            for (let i = 0; i < content.length; i++) {
+                const char = content[i];
+                
+                // Handle number indicator
+                if (char === '#') {
+                    inNumber = true;
+                    continue;
+                }
+                
+                // Handle spaces - reset number mode
+                if (char === ' ') {
+                    plainText += ' ';
+                    inNumber = false;
+                    continue;
+                }
+                
+                // Handle letters/numbers
+                if (char >= 'a' && char <= 'j') {
+                    if (inNumber) {
+                        // Convert to number (a=1, b=2, etc.)
+                        plainText += String.fromCharCode(char.charCodeAt(0) - 'a'.charCodeAt(0) + '1'.charCodeAt(0));
+                    } else {
+                        plainText += char;
+                    }
+                } else if (char >= 'k' && char <= 'z') {
+                    // Regular letters, not numbers
+                    plainText += char;
+                    inNumber = false;
+                } else {
+                    // Other characters
+                    plainText += char;
+                    if (char !== '.' && char !== ',') {
+                        inNumber = false;
+                    }
+                }
+            }
+            
+            // Set the input field to show the back-translated text
+            document.getElementById('inputText').value = plainText;
+            document.getElementById('inputCount').textContent = plainText.length + ' characters';
+            
+            // Set the output to show the Unicode braille
             document.getElementById('brailleOutput').textContent = unicodeText;
             document.getElementById('outputCount').textContent = unicodeText.length + ' characters';
             
-            // Clear input area and show import message
-            document.getElementById('inputText').value = 'Imported from BRF file';
-            document.getElementById('inputCount').textContent = 'Imported from BRF file'.length + ' characters';
+            // Update dots display if active
+            if (currentView === 'dots') {
+                drawDotPattern();
+            }
         } else {
-            // Regular text file
+            // Regular text file - just import and translate
             document.getElementById('inputText').value = content;
-            updateCharCount();
+            document.getElementById('inputCount').textContent = content.length + ' characters';
             translateText();
         }
     };
