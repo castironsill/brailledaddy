@@ -1,4 +1,4 @@
-# UEB Translator Pro
+# BrailleDaddy
 
 A professional web-based Unified English Braille (UEB) translator with ADA-compliant export capabilities for creating accessible signage.
 
@@ -40,7 +40,7 @@ A professional web-based Unified English Braille (UEB) translator with ADA-compl
 
 ## 🚀 Live Demo
 
-[Try UEB Translator Pro](https://your-github-username.github.io/brailledaddy/)
+[Try BrailleDaddy](https://castironsill.github.io/brailledaddy/)
 
 ## 💻 Usage
 
@@ -64,7 +64,7 @@ A professional web-based Unified English Braille (UEB) translator with ADA-compl
 
 ## 📋 ADA Compliance Notes
 
-This tool generates SVG files compliant with ADA §703.3.1 specifications. Remember:
+BrailleDaddy generates SVG files compliant with ADA §703.3.1 specifications. Remember:
 - Dots must be raised 0.6-0.9mm (controlled by your printer)
 - Dots must be domed/rounded, not flat
 - Only capitalize first words, proper nouns, and initials
@@ -79,7 +79,7 @@ Optimized for braille embossers including:
 
 ## 📄 License
 
-MIT License - feel free to use this tool for personal or commercial projects.
+MIT License - feel free to use BrailleDaddy for personal or commercial projects.
 
 ## 🤝 Contributing
 
