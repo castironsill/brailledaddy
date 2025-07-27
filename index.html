@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UEB Translator Pro - Unified English Braille Translation Tool</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="header">
+        <h1>UEB Translator Pro</h1>
+        <p class="subtitle">Professional Unified English Braille Translation Tool</p>
+    </header>
+
+    <main class="main-container">
+        <!-- Controls Section -->
+        <div class="controls">
+            <div class="control-group">
+                <label for="grade">Braille Grade</label>
+                <select id="grade">
+                    <option value="1">Grade 1 (Uncontracted)</option>
+                    <option value="2">Grade 2 (Contracted)</option>
+                </select>
+            </div>
+            <button onclick="translateText()" id="translateBtn">Translate</button>
+            <button onclick="clearAll()">Clear All</button>
+        </div>
+
+        <!-- Translation Area -->
+        <div class="translation-area">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Input Text</h2>
+                    <span class="char-count" id="inputCount">0 characters</span>
+                </div>
+                <textarea id="inputText" placeholder="Enter text to translate to braille..."></textarea>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">Braille Output</h2>
+                    <span class="char-count" id="outputCount">0 characters</span>
+                </div>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="toggleView('unicode')">Unicode</button>
+                    <button class="view-btn" onclick="toggleView('dots')">Dot Pattern</button>
+                </div>
+                <div id="brailleOutput" class="braille-display"></div>
+                <canvas id="dotsCanvas" class="dots-display" style="display: none;"></canvas>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+<div class="export-section">
+    <h3 class="export-title">Export Options</h3>
+    <div class="export-buttons">
+        <button onclick="exportAsText()">Export as Text</button>
+        <button onclick="exportAsBRF()">Export as BRF</button>
+        <button onclick="exportAsSVG()">Export as SVG</button>
+        <button onclick="copyToClipboard()">Copy Braille</button>
+    </div>
+</div>
+
+<!-- Import Section -->
+<div class="import-section">
+    <h3 class="import-title">Import Options</h3>
+    <div class="import-buttons">
+        <input type="file" id="fileInput" accept=".txt,.brf" style="display: none;" onchange="handleFileImport(event)">
+        <button onclick="document.getElementById('fileInput').click()">Import File (TXT/BRF)</button>
+        <div class="drag-drop" id="dragDropArea">
+            <p>Or drag and drop a file here</p>
+        </div>
+    </div>
+</div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
