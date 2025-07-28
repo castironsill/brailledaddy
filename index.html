@@ -28,12 +28,20 @@
         <!-- Translation Area -->
         <div class="translation-area">
             <div class="panel">
-                <div class="panel-header">
-                    <h2 class="panel-title">Input Text</h2>
-                    <span class="char-count" id="inputCount">0 characters</span>
-                </div>
-                <textarea id="inputText" placeholder="Enter text to translate to braille..."></textarea>
-            </div>
+    <div class="panel-header">
+        <h2 class="panel-title">Input Text</h2>
+        <span class="char-count" id="inputCount">0 characters</span>
+        <div class="input-mode-toggle">
+            <button class="mode-btn active" onclick="setInputMode('single')">Single Line</button>
+            <button class="mode-btn" onclick="setInputMode('multi')">Multi-line Sign</button>
+        </div>
+    </div>
+    <textarea id="inputText" placeholder="Enter text to translate to braille..." rows="4"></textarea>
+    <div id="multiLineHelp" class="help-text" style="display: none;">
+        <p>📏 Each line will be properly spaced for ADA compliance (10.0-10.2mm)</p>
+        <p>💡 Common format: Line 1: Room number, Line 2: Room name</p>
+    </div>
+</div>
 
             <div class="panel">
                 <div class="panel-header">

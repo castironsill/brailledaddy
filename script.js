@@ -143,6 +143,29 @@ const capitalSign = '⠠';
 const letterSign = '⠰';
 
 let currentView = 'unicode';
+// Input mode handling
+let inputMode = 'single';
+
+function setInputMode(mode) {
+    inputMode = mode;
+    const textarea = document.getElementById('inputText');
+    const helpText = document.getElementById('multiLineHelp');
+    
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    if (mode === 'multi') {
+        textarea.rows = 4;
+        helpText.style.display = 'block';
+        textarea.placeholder = "Line 1: Room number\nLine 2: Room name\nLine 3: Additional info...";
+    } else {
+        textarea.rows = 1;
+        helpText.style.display = 'none';
+        textarea.placeholder = "Enter text to translate to braille...";
+    }
+}
 
 function translateText() {
     const input = document.getElementById('inputText').value;
