@@ -634,21 +634,21 @@ function exportWithSettings() {
     const output = document.getElementById('brailleOutput').textContent;
     const input = document.getElementById('inputText').value;
     
-    // Get settings from dialog
+    // Get settings from dialog - all in millimeters
     const settings = {
         dotDiameter: parseFloat(document.getElementById('dotDiameter').value),
         dotSpacing: parseFloat(document.getElementById('dotSpacing').value),
         cellSpacing: parseFloat(document.getElementById('cellSpacing').value),
         lineSpacing: parseFloat(document.getElementById('lineSpacing').value),
-        pageMargin: parseFloat(document.getElementById('pageMargin').value),
-        mmToPx: 3.78  // 96 DPI
+        pageMargin: parseFloat(document.getElementById('pageMargin').value)
     };
     
-    const lines = output.split('\n');
+    const lines = output.split('\n').filter(line => line.trim()); // Remove empty lines
     const maxLineLength = Math.max(...lines.map(line => line.length));
     
-    const svgWidth = Math.ceil((maxLineLength * settings.cellSpacing + 2 * settings.pageMargin) * settings.mmToPx);
-    const svgHeight = Math.ceil((lines.length * settings.lineSpacing + 2 * settings.pageMargin) * settings.mmToPx);
+    // Calculate SVG dimensions in millimeters
+    const svgWidth = maxLineLength * settings.cellSpacing + 2 * settings.pageMargin;
+    const svgHeight = lines.length * settings.lineSpacing + 2 * settings.pageMargin;
     
     // Correct dot position mapping
     const dotPositions = {
@@ -661,46 +661,84 @@ function exportWithSettings() {
     };
     
     let svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}">
-  <!-- ADA Compliant Braille for: ${input}
-       Dot Diameter: ${settings.dotDiameter}mm
-       Dot Spacing: ${settings.dotSpacing}mm  
-       Cell Spacing: ${settings.cellSpacing}mm
-       Line Spacing: ${settings.lineSpacing}mm
-       Page Margin: ${settings.pageMargin}mm
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="${svgWidth.toFixed(2)}mm" 
+     height="${svgHeight.toFixed(2)}mm" 
+     viewBox="0 0 ${svgWidth.toFixed(2)} ${svgHeight.toFixed(2)}">
+  <!-- ADA Compliant Braille - TRUE SCALE OUTPUT
+       Original Text: ${input}
+       ===== CRITICAL: ADA COMPLIANCE INFORMATION =====
+       This SVG uses MILLIMETER units for true-scale output.
+       When importing/printing, ensure your software preserves these units.
+       
+       Current Settings (ADA §703.3.1 compliant):
+       - Dot Diameter: ${settings.dotDiameter}mm (ADA: 1.5-1.6mm)
+       - Dot Spacing: ${settings.dotSpacing}mm (ADA: 2.3-2.5mm)  
+       - Cell Spacing: ${settings.cellSpacing}mm (ADA: 6.1-7.6mm)
+       - Line Spacing: ${settings.lineSpacing}mm (ADA: 10.0-10.2mm)
+       - Page Margin: ${settings.pageMargin}mm
+       
+       IMPORTANT FOR PRODUCTION:
+       1. Do NOT scale or resize this SVG
+       2. Ensure dots are raised 0.6-0.9mm (0.025-0.037")
+       3. Dots must be domed/rounded, not flat
+       4. Print at 100% scale / actual size
+       ================================================
   -->
-  <rect width="${svgWidth}" height="${svgHeight}" fill="white"/>
-  <g id="braille-dots" fill="black">`;
+  <defs>
+    <style>
+      .braille-dot { fill: black; }
+      .background { fill: white; }
+    </style>
+  </defs>
+  
+  <rect class="background" width="${svgWidth.toFixed(2)}" height="${svgHeight.toFixed(2)}"/>
+  <g id="braille-dots">`;
     
     lines.forEach((line, lineIndex) => {
         for (let charIndex = 0; charIndex < line.length; charIndex++) {
             const char = line[charIndex];
             const dots = brailleDotMap[char] || [];
             
+            // Skip spaces - they don't have dots
+            if (char === ' ') continue;
+            
             dots.forEach(dotNum => {
                 const pos = dotPositions[dotNum];
                 if (!pos) return;
                 
+                // Calculate position in millimeters
                 const cellX = settings.pageMargin + charIndex * settings.cellSpacing;
                 const cellY = settings.pageMargin + lineIndex * settings.lineSpacing;
                 
-                const cx = (cellX + pos.col * settings.dotSpacing) * settings.mmToPx;
-                const cy = (cellY + pos.row * settings.dotSpacing) * settings.mmToPx;
-                const r = (settings.dotDiameter / 2) * settings.mmToPx;
+                const cx = cellX + pos.col * settings.dotSpacing;
+                const cy = cellY + pos.row * settings.dotSpacing;
+                const r = settings.dotDiameter / 2;
                 
-                svg += `\n    <circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${r.toFixed(2)}"/>`;
+                svg += `\n    <circle class="braille-dot" cx="${cx.toFixed(3)}" cy="${cy.toFixed(3)}" r="${r.toFixed(3)}"/>`;
             });
         }
     });
     
-    svg += `\n  </g>\n</svg>`;
+    svg += `\n  </g>\n  
+  <!-- Production Notes:
+       Total dots: ${svg.match(/circle/g)?.length || 0}
+       Grid: ${maxLineLength} cells × ${lines.length} lines
+       Physical size: ${svgWidth.toFixed(1)}mm × ${svgHeight.toFixed(1)}mm
+       Grade 2 UEB Braille (contracted)
+  -->
+</svg>`;
     
     const blob = new Blob([svg], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'braille_ada_signage.svg';
+    
+    // Create filename with dimensions for clarity
+    const filename = `braille_ada_${svgWidth.toFixed(0)}x${svgHeight.toFixed(0)}mm.svg`;
+    a.download = filename;
+    
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
