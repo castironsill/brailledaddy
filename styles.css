@@ -608,3 +608,21 @@ canvas.fullscreen {
     margin: 0.25rem 0;
     color: var(--text-secondary);
 }
+/* GitHub Link */
+.github-link {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    z-index: 10; /* Add this to ensure it's clickable */
+}
