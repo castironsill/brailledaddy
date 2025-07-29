@@ -554,6 +554,40 @@ function copyToClipboard() {
     });
 }
 
+function copyBrailleOutput() {
+    const output = document.getElementById('brailleOutput').textContent;
+    
+    if (!output || output.trim() === '') {
+        alert('Nothing to copy! Please translate some text first.');
+        return;
+    }
+    
+    navigator.clipboard.writeText(output).then(() => {
+        // Get the button that was clicked
+        const buttons = document.querySelectorAll('button');
+        let button = null;
+        buttons.forEach(btn => {
+            if (btn.textContent === 'Copy Braille' || btn.textContent === 'Copied!') {
+                button = btn;
+            }
+        });
+        
+        if (button) {
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            button.style.backgroundColor = 'var(--accent)';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.backgroundColor = '';
+            }, 2000);
+        }
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy to clipboard');
+    });
+}
+
 // Auto-update character count as user types
 document.getElementById('inputText').addEventListener('input', function() {
     document.getElementById('inputCount').textContent = this.value.length + ' characters';
