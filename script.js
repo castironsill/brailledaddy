@@ -48,7 +48,8 @@ const groupsigns = {
     'wh': '⠱', 'ou': '⠳', 'st': '⠌',
     'gh': '⠣', 'ed': '⠫', 'er': '⠻',
     'ow': '⠪', 'ar': '⠜', 'ing': '⠬',
-    'en': '⠢', 'in': '⠔', 'to': '⠖'
+    'en': '⠢', 'in': '⠔', 'to': '⠖', 'by': '⠃⠽',
+'into': '⠔⠖'
 };
 
 // 3. Initial-letter contractions (dot 5 + letter)
@@ -87,6 +88,15 @@ const shortforms = {
     'together': '⠞⠛⠗', 'tomorrow': '⠞⠍', 'tonight': '⠞⠝',
     'would': '⠺⠙', 'your': '⠽⠗', 'yourself': '⠽⠗⠋',
     'yourselves': '⠽⠗⠧⠎'
+};
+
+// Final-letter contractions (used at the end of words)
+const finalLetterContractions = {
+    'tion': '⠰⠝', 'ness': '⠰⠎', 'ment': '⠰⠞',
+    'ity': '⠰⠽', 'ation': '⠠⠝', 'ally': '⠠⠽',
+    'ful': '⠰⠇', 'ence': '⠰⠑', 'ance': '⠨⠑',
+    'ound': '⠨⠙', 'ount': '⠨⠞', 'sion': '⠨⠝',
+    'less': '⠨⠎', 'ong': '⠰⠛'
 };
 
 // Braille dot positions mapping
@@ -173,7 +183,8 @@ function translateGrade1(text) {
         if (isDigit && !inNumber) {
             result += numberSign;
             inNumber = true;
-        } else if (!isDigit && char !== ' ' && char !== '.' && char !== ',') {
+        } else if (!isDigit && !/[\s\.\,\;\:\!\?\-\(\)\/]/.test(char)) {
+            // Fixed: Reset number mode for more punctuation
             inNumber = false;
         }
         
@@ -205,11 +216,11 @@ function translateGrade2(text) {
         const lowerChar = char.toLowerCase();
         
         // Check if this is the start of a word
-        const isWordStart = position === 0 || /[\s\.\,\;\:\!\?\-]/.test(text[position - 1]);
+        const isWordStart = position === 0 || /[\s\.\,\;\:\!\?\-\(\)\/]/.test(text[position - 1]);
         
         // Find the current word
         let wordEnd = position;
-        while (wordEnd < text.length && !/[\s\.\,\;\:\!\?\-]/.test(text[wordEnd])) {
+        while (wordEnd < text.length && !/[\s\.\,\;\:\!\?\-\(\)\/]/.test(text[wordEnd])) {
             wordEnd++;
         }
         const currentWord = text.substring(position, wordEnd);
@@ -224,7 +235,7 @@ function translateGrade2(text) {
             result += uebGrade1[char];
             position++;
             continue;
-        } else if (char !== ' ' && char !== '.' && char !== ',') {
+        } else if (!/[\s\.\,]/.test(char)) {
             inNumber = false;
         }
         
@@ -261,7 +272,33 @@ function translateGrade2(text) {
             matched = true;
         }
         
-        // 4. Check for groupsigns (can be used anywhere in a word)
+        // 4. Check for final-letter contractions
+        if (!matched && currentWord.length > 3) {
+            for (let [ending, contraction] of Object.entries(finalLetterContractions)) {
+                if (currentWordLower.endsWith(ending) && currentWordLower.length > ending.length) {
+                    // Translate the stem
+                    const stem = currentWord.substring(0, currentWord.length - ending.length);
+                    let stemBraille = '';
+                    
+                    // Check if stem needs capital
+                    if (stem[0] !== stem[0].toLowerCase()) {
+                        stemBraille += capitalSign;
+                    }
+                    
+                    // Translate stem character by character (could be improved)
+                    for (let stemChar of stem.toLowerCase()) {
+                        stemBraille += uebGrade1[stemChar] || stemChar;
+                    }
+                    
+                    result += stemBraille + contraction;
+                    position += currentWord.length;
+                    matched = true;
+                    break;
+                }
+            }
+        }
+        
+        // 5. Check for groupsigns (can be used anywhere in a word)
         if (!matched) {
             // Try different lengths of groupsigns (from longest to shortest)
             for (let len = 3; len >= 2; len--) {
@@ -277,7 +314,7 @@ function translateGrade2(text) {
             }
         }
         
-        // 5. Single character fallback
+        // 6. Single character fallback
         if (!matched) {
             // Check for capital letter
             if (/[A-Z]/.test(char)) {
@@ -820,95 +857,100 @@ function handleFileImport(event) {
     const reader = new FileReader();
     const fileName = file.name.toLowerCase();
     
+    reader.onerror = function(e) {
+        alert('Error reading file. Please try again.');
+        console.error('File read error:', e);
+    };
+    
     reader.onload = function(e) {
-        const content = e.target.result;
-        
-        if (fileName.endsWith('.brf')) {
-            // Convert BRF to Unicode
-            const brfToUnicode = {
-                ' ': '⠀', 'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑',
-                'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊', 'j': '⠚', 'k': '⠅',
-                'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕', 'p': '⠏', 'q': '⠟',
-                'r': '⠗', 's': '⠎', 't': '⠞', 'u': '⠥', 'v': '⠧', 'w': '⠺',
-                'x': '⠭', 'y': '⠽', 'z': '⠵', '&': '⠯', '=': '⠿', '(': '⠷',
-                '!': '⠮', ')': '⠾', '*': '⠡', '<': '⠩', '%': '⠹', '?': '⠱',
-                ':': '⠳', '$': '⠻', ']': '⠣', '\\': '⠬', '[': '⠫', 'W': '⠪',
-                '@': '⠜', '^': '⠢', '4': '⠲', '1': '⠂', '2': '⠆', '3': '⠒',
-                '5': '⠖', '6': '⠦', '9': '⠔', '0': '⠴', '7': '⠶', '/': '⠌',
-                '8': '⠤', '.': '⠨', ',': '⠰', ';': '⠠', '#': '⠼', '`': '⠸',
-                "'": '⠘', '"': '⠈', '-': '⠐', ' ': ' ', '\n': '\n'
-            };
+        try {
+            const content = e.target.result;
             
-            // Also create reverse mapping for back-translation
-            const unicodeToBRF = {};
-            for (let [brf, unicode] of Object.entries(brfToUnicode)) {
-                unicodeToBRF[unicode] = brf;
-            }
-            
-            // Convert BRF to Unicode for display
-            let unicodeText = '';
-            for (let char of content) {
-                unicodeText += brfToUnicode[char] || char;
-            }
-            
-            // Try to back-translate to regular text for the input field
-            let plainText = '';
-            let inNumber = false;
-            
-            for (let i = 0; i < content.length; i++) {
-                const char = content[i];
-                
-                // Handle number indicator
-                if (char === '#') {
-                    inNumber = true;
-                    continue;
+            if (fileName.endsWith('.brf')) {
+                // Validate BRF content
+                const validBRF = /^[a-zA-Z0-9\s\!\@\#\$\%\^\&\*\(\)\-\=\[\]\\\;\'\,\.\/\<\>\?\:\"\{\}\|\_\+\`\~\n\r]+$/;
+                if (!validBRF.test(content)) {
+                    alert('This BRF file contains invalid characters and cannot be imported.');
+                    return;
                 }
                 
-                // Handle spaces - reset number mode
-                if (char === ' ') {
-                    plainText += ' ';
-                    inNumber = false;
-                    continue;
+                // Convert BRF to Unicode
+                const brfToUnicode = {
+                    ' ': '⠀', 'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑',
+                    'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊', 'j': '⠚', 'k': '⠅',
+                    'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕', 'p': '⠏', 'q': '⠟',
+                    'r': '⠗', 's': '⠎', 't': '⠞', 'u': '⠥', 'v': '⠧', 'w': '⠺',
+                    'x': '⠭', 'y': '⠽', 'z': '⠵', '&': '⠯', '=': '⠿', '(': '⠷',
+                    '!': '⠮', ')': '⠾', '*': '⠡', '<': '⠩', '%': '⠹', '?': '⠱',
+                    ':': '⠳', '$': '⠻', ']': '⠣', '\\': '⠬', '[': '⠫', 'W': '⠪',
+                    '@': '⠜', '^': '⠢', '4': '⠲', '1': '⠂', '2': '⠆', '3': '⠒',
+                    '5': '⠖', '6': '⠦', '9': '⠔', '0': '⠴', '7': '⠶', '/': '⠌',
+                    '8': '⠤', '.': '⠨', ',': '⠰', ';': '⠠', '#': '⠼', '`': '⠸',
+                    "'": '⠘', '"': '⠈', '-': '⠐', ' ': ' ', '\n': '\n', '\r': ''
+                };
+                
+                // Convert BRF to Unicode for display
+                let unicodeText = '';
+                for (let char of content) {
+                    unicodeText += brfToUnicode[char] || char;
                 }
                 
-                // Handle letters/numbers
-                if (char >= 'a' && char <= 'j') {
-                    if (inNumber) {
-                        // Convert to number (a=1, b=2, etc.)
-                        plainText += String.fromCharCode(char.charCodeAt(0) - 'a'.charCodeAt(0) + '1'.charCodeAt(0));
+                // Try to back-translate to regular text
+                let plainText = '';
+                let inNumber = false;
+                
+                for (let i = 0; i < content.length; i++) {
+                    const char = content[i];
+                    
+                    if (char === '#') {
+                        inNumber = true;
+                        continue;
+                    }
+                    
+                    if (char === ' ' || char === '\n' || char === '\r') {
+                        plainText += char;
+                        inNumber = false;
+                        continue;
+                    }
+                    
+                    if (char >= 'a' && char <= 'j') {
+                        if (inNumber) {
+                            plainText += String.fromCharCode(char.charCodeAt(0) - 'a'.charCodeAt(0) + '1'.charCodeAt(0));
+                        } else {
+                            plainText += char;
+                        }
+                    } else if (char >= 'k' && char <= 'z') {
+                        plainText += char;
+                        inNumber = false;
                     } else {
                         plainText += char;
-                    }
-                } else if (char >= 'k' && char <= 'z') {
-                    // Regular letters, not numbers
-                    plainText += char;
-                    inNumber = false;
-                } else {
-                    // Other characters
-                    plainText += char;
-                    if (char !== '.' && char !== ',') {
-                        inNumber = false;
+                        if (!/[\.\,]/.test(char)) {
+                            inNumber = false;
+                        }
                     }
                 }
+                
+                // Set the input field
+                document.getElementById('inputText').value = plainText;
+                document.getElementById('inputCount').textContent = plainText.length + ' characters';
+                
+                // Set the output
+                document.getElementById('brailleOutput').textContent = unicodeText;
+                document.getElementById('outputCount').textContent = unicodeText.length + ' characters';
+                
+                // Update dots display if active
+                if (currentView === 'dots') {
+                    drawDotPattern();
+                }
+            } else {
+                // Regular text file
+                document.getElementById('inputText').value = content;
+                document.getElementById('inputCount').textContent = content.length + ' characters';
+                translateText();
             }
-            
-            // Set the input field to show the back-translated text
-            document.getElementById('inputText').value = plainText;
-            document.getElementById('inputCount').textContent = plainText.length + ' characters';
-            
-            // Set the output to show the Unicode braille
-            document.getElementById('brailleOutput').textContent = unicodeText;
-            document.getElementById('outputCount').textContent = unicodeText.length + ' characters';
-            
-            // Update dots display if active
-            if (currentView === 'dots') {
-                drawDotPattern();
-            }
-        } else {
-            // Regular text file - just import and translate
-            document.getElementById('inputText').value = content;
-            document.getElementById('inputCount').textContent = content.length + ' characters';
-            translateText();
+        } catch (error) {
+            alert('Error processing file: ' + error.message);
+            console.error('File processing error:', error);
         }
     };
     
