@@ -24,34 +24,45 @@ const uebGrade1 = {
 };
 
 // COMPLETE UEB Grade 2 contractions
-const uebGrade2Contractions = {
-    // Alphabetic wordsigns (strong contractions) - single cell, whole word
+// STEP 2: Replace the deleted uebGrade2Contractions with these organized objects:
+
+// 1. Whole word contractions ONLY (single cell, must be standalone words)
+const wholeWordContractions = {
     'but': '⠃', 'can': '⠉', 'do': '⠙', 'every': '⠑',
     'from': '⠋', 'go': '⠛', 'have': '⠓', 'just': '⠚',
     'knowledge': '⠅', 'like': '⠇', 'more': '⠍', 'not': '⠝',
     'people': '⠏', 'quite': '⠟', 'rather': '⠗', 'so': '⠎',
     'that': '⠞', 'us': '⠥', 'very': '⠧', 'will': '⠺',
     'it': '⠭', 'you': '⠽', 'as': '⠵',
-    
-    // Strong contractions
-    'child': '⠡', 'shall': '⠩', 'this': '⠹', 
+    'child': '⠡', 'shall': '⠩', 'this': '⠹',
     'which': '⠱', 'out': '⠳', 'still': '⠌',
-    
-    // Strong groupsigns (strong contractions used within words)
+    'and': '⠯', 'for': '⠿', 'of': '⠷',
+    'the': '⠮', 'with': '⠾',
+    'be': '⠆', 'enough': '⠢', 'were': '⠶',
+    'his': '⠦', 'in': '⠔', 'was': '⠴'
+};
+
+// 2. Groupsigns (can be used within words)
+const groupsigns = {
     'ch': '⠡', 'sh': '⠩', 'th': '⠹', 
     'wh': '⠱', 'ou': '⠳', 'st': '⠌',
     'gh': '⠣', 'ed': '⠫', 'er': '⠻',
     'ow': '⠪', 'ar': '⠜', 'ing': '⠬',
-    
-    // Lower wordsigns (two-cell, whole word)
-    'be': '⠆', 'enough': '⠢', 'were': '⠶',
-    'his': '⠦', 'in': '⠔', 'was': '⠴',
-    
-    // Lower groupsigns (used within words)
-    'en': '⠢', 'in': '⠔', 'be': '⠆',
-    'dis': '⠲', 'con': '⠒', 'com': '⠤',
-    
-    // Shortforms (alphabetic order)
+    'en': '⠢', 'in': '⠔', 'to': '⠖'
+};
+
+// 3. Initial-letter contractions (dot 5 + letter)
+const initialLetterContractions = {
+    'day': '⠐⠙', 'ever': '⠐⠑', 'father': '⠐⠋',
+    'here': '⠐⠓', 'know': '⠐⠅', 'lord': '⠐⠇',
+    'mother': '⠐⠍', 'name': '⠐⠝', 'one': '⠐⠕',
+    'once': '⠐⠕', 'part': '⠐⠏', 'question': '⠐⠟', 
+    'right': '⠐⠗', 'some': '⠐⠎', 'time': '⠐⠞', 
+    'under': '⠐⠥', 'work': '⠐⠺', 'young': '⠐⠽'
+};
+
+// 4. Shortforms (common words with special abbreviations)
+const shortforms = {
     'about': '⠁⠃', 'above': '⠁⠃⠧', 'according': '⠁⠉',
     'across': '⠁⠉⠗', 'after': '⠁⠋', 'afternoon': '⠁⠋⠝',
     'afterward': '⠁⠋⠺', 'again': '⠁⠛', 'against': '⠁⠛⠌',
@@ -69,56 +80,13 @@ const uebGrade2Contractions = {
     'its': '⠭⠎', 'itself': '⠭⠋', 'letter': '⠇⠗',
     'little': '⠇⠇', 'much': '⠍⠡', 'must': '⠍⠌',
     'myself': '⠍⠽⠋', 'necessary': '⠝⠑⠉', 'neither': '⠝⠑⠊',
-    'oneself': '⠐⠕⠋', 'ourselves': '⠳⠗⠧⠎', 'paid': '⠏⠙',
-    'perceive': '⠏⠻⠉⠧', 'perceiving': '⠏⠻⠉⠧⠛', 'perhaps': '⠏⠻⠓',
-    'quick': '⠟⠅', 'receive': '⠗⠉⠧', 'receiving': '⠗⠉⠧⠛',
-    'rejoice': '⠗⠚⠉', 'rejoicing': '⠗⠚⠉⠛', 'said': '⠎⠙',
-    'should': '⠩⠙', 'such': '⠎⠡', 'themselves': '⠮⠍⠧⠎',
-    'thyself': '⠹⠽⠋', 'today': '⠞⠙', 'together': '⠞⠛⠗',
-    'tomorrow': '⠞⠍', 'tonight': '⠞⠝', 'would': '⠺⠙',
-    'your': '⠽⠗', 'yourself': '⠽⠗⠋', 'yourselves': '⠽⠗⠧⠎',
-    
-    // Strong wordsigns (two-cell, whole word)
-    'and': '⠯', 'for': '⠿', 'of': '⠷',
-    'the': '⠮', 'with': '⠾',
-    
-    // Initial-letter contractions (whole word or beginning of word)
-    'day': '⠐⠙', 'ever': '⠐⠑', 'father': '⠐⠋',
-    'here': '⠐⠓', 'know': '⠐⠅', 'lord': '⠐⠇',
-    'mother': '⠐⠍', 'name': '⠐⠝', 'one': '⠐⠕',
-    'part': '⠐⠏', 'question': '⠐⠟', 'right': '⠐⠗',
-    'some': '⠐⠎', 'time': '⠐⠞', 'under': '⠐⠥',
-    'work': '⠐⠺', 'young': '⠐⠽',
-    
-    // These also work as groupsigns in longer words
-    'there': '⠐⠮', 'character': '⠐⠡', 'through': '⠐⠹',
-    'where': '⠐⠱', 'ought': '⠐⠳', 'upon': '⠘⠥',
-    'word': '⠘⠺', 'these': '⠘⠮', 'those': '⠘⠹',
-    'whose': '⠘⠱', 'cannot': '⠘⠉',
-    'had': '⠘⠓', 'many': '⠘⠍', 'spirit': '⠘⠎',
-    'world': '⠘⠺', 'their': '⠘⠮',
-    
-    // Final-letter contractions (end of word)
-    'ound': '⠨⠙', 'ance': '⠨⠑', 'sion': '⠨⠝',
-    'less': '⠨⠎', 'ount': '⠨⠞', 'ence': '⠰⠑',
-    'ong': '⠰⠛', 'ful': '⠰⠇', 'tion': '⠰⠝',
-    'ness': '⠰⠎', 'ment': '⠰⠞', 'ity': '⠰⠽',
-    'ation': '⠠⠝', 'ally': '⠠⠽',
-    
-    // Dot 4-5-6 contractions
-    'and': '⠯', 'for': '⠿', 'of': '⠷',
-    'the': '⠮', 'with': '⠾',
-    
-    // Dot 4-5 contractions  
-    'in': '⠔', 'en': '⠢', 'con': '⠒',
-    'dis': '⠲', 'com': '⠤', 'be': '⠆',
-    
-    // Dot 4-6 contractions
-    'to': '⠖', 'into': '⠔⠖', 'by': '⠃⠽',
-    
-    // Lower sign contractions
-    'ea': '⠂', 'bb': '⠆', 'cc': '⠒', 
-    'dd': '⠲', 'ff': '⠖', 'gg': '⠶'
+    'paid': '⠏⠙', 'perhaps': '⠏⠻⠓', 'quick': '⠟⠅',
+    'receive': '⠗⠉⠧', 'receiving': '⠗⠉⠧⠛', 'rejoice': '⠗⠚⠉',
+    'rejoicing': '⠗⠚⠉⠛', 'said': '⠎⠙', 'should': '⠩⠙',
+    'such': '⠎⠡', 'themselves': '⠮⠍⠧⠎', 'today': '⠞⠙',
+    'together': '⠞⠛⠗', 'tomorrow': '⠞⠍', 'tonight': '⠞⠝',
+    'would': '⠺⠙', 'your': '⠽⠗', 'yourself': '⠽⠗⠋',
+    'yourselves': '⠽⠗⠧⠎'
 };
 
 // Braille dot positions mapping
@@ -222,64 +190,102 @@ function translateGrade1(text) {
     return result;
 }
 
+// STEP 4: Replace the old translateGrade2 function with this:
+
 function translateGrade2(text) {
     let result = '';
     let position = 0;
+    let inNumber = false;
     
     while (position < text.length) {
         let matched = false;
         
-        // Try to match the longest possible contraction first
-        // Check for shortforms and longer contractions
-        for (let length = Math.min(15, text.length - position); length > 0; length--) {
-            const substring = text.substr(position, length).toLowerCase();
-            const originalSubstring = text.substr(position, length);
-            
-            // Check if this is a whole word match
-            const isWholeWord = (position === 0 || /\s/.test(text[position - 1])) &&
-                               (position + length === text.length || /\s/.test(text[position + length]));
-            
-            // Check for contractions
-            if (uebGrade2Contractions[substring]) {
-                // Some contractions only work as whole words
-                const needsWholeWord = ['but', 'can', 'do', 'every', 'from', 'go', 
-                                       'have', 'just', 'knowledge', 'like', 'more', 
-                                       'not', 'people', 'quite', 'rather', 'so', 
-                                       'that', 'us', 'very', 'will', 'it', 'you', 
-                                       'as', 'and', 'for', 'of', 'the', 'with',
-                                       'be', 'enough', 'were', 'his', 'in', 'was'].includes(substring);
-                
-                if (!needsWholeWord || isWholeWord) {
-                    // Check for capital
-                    if (originalSubstring[0] !== originalSubstring[0].toLowerCase()) {
-                        result += capitalSign;
+        // Get current character
+        const char = text[position];
+        const lowerChar = char.toLowerCase();
+        
+        // Check if this is the start of a word
+        const isWordStart = position === 0 || /[\s\.\,\;\:\!\?\-]/.test(text[position - 1]);
+        
+        // Find the current word
+        let wordEnd = position;
+        while (wordEnd < text.length && !/[\s\.\,\;\:\!\?\-]/.test(text[wordEnd])) {
+            wordEnd++;
+        }
+        const currentWord = text.substring(position, wordEnd);
+        const currentWordLower = currentWord.toLowerCase();
+        
+        // Handle numbers
+        if (/\d/.test(char)) {
+            if (!inNumber) {
+                result += numberSign;
+                inNumber = true;
+            }
+            result += uebGrade1[char];
+            position++;
+            continue;
+        } else if (char !== ' ' && char !== '.' && char !== ',') {
+            inNumber = false;
+        }
+        
+        // 1. Check for whole word contractions (only if at word start)
+        if (isWordStart && wholeWordContractions[currentWordLower]) {
+            // Check for capital
+            if (currentWord[0] !== currentWord[0].toLowerCase()) {
+                result += capitalSign;
+            }
+            result += wholeWordContractions[currentWordLower];
+            position += currentWord.length;
+            matched = true;
+        }
+        
+        // 2. Check for shortforms (only if at word start)
+        if (!matched && isWordStart && shortforms[currentWordLower]) {
+            // Check for capital
+            if (currentWord[0] !== currentWord[0].toLowerCase()) {
+                result += capitalSign;
+            }
+            result += shortforms[currentWordLower];
+            position += currentWord.length;
+            matched = true;
+        }
+        
+        // 3. Check for initial-letter contractions (only if at word start)
+        if (!matched && isWordStart && initialLetterContractions[currentWordLower]) {
+            // Check for capital
+            if (currentWord[0] !== currentWord[0].toLowerCase()) {
+                result += capitalSign;
+            }
+            result += initialLetterContractions[currentWordLower];
+            position += currentWord.length;
+            matched = true;
+        }
+        
+        // 4. Check for groupsigns (can be used anywhere in a word)
+        if (!matched) {
+            // Try different lengths of groupsigns (from longest to shortest)
+            for (let len = 3; len >= 2; len--) {
+                if (position + len <= text.length) {
+                    const substr = text.substr(position, len).toLowerCase();
+                    if (groupsigns[substr]) {
+                        result += groupsigns[substr];
+                        position += len;
+                        matched = true;
+                        break;
                     }
-                    
-                    result += uebGrade2Contractions[substring];
-                    position += length;
-                    matched = true;
-                    break;
                 }
             }
         }
         
-        // If no contraction matched, translate the single character
+        // 5. Single character fallback
         if (!matched) {
-            const char = text[position];
-            const isDigit = /\d/.test(char);
-            const isUpper = char === char.toUpperCase() && char !== char.toLowerCase();
-            
-            // Handle numbers
-            if (isDigit && (position === 0 || !/\d/.test(text[position - 1]))) {
-                result += numberSign;
-            }
-            
-            // Handle capitals
-            if (isUpper && /[A-Z]/.test(char)) {
+            // Check for capital letter
+            if (/[A-Z]/.test(char)) {
                 result += capitalSign;
             }
             
-            result += uebGrade1[char.toLowerCase()] || char;
+            // Add the character
+            result += uebGrade1[lowerChar] || char;
             position++;
         }
     }
