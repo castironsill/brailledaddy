@@ -1,9 +1,7 @@
 # BrailleDaddy
 
-**Notice:**  
-BrailleDaddy is currently offline while we implement corrections and upgrades to ADA-compliant braille spacing, capitalization rules, and SVG export formatting.  
-The application will return once all revisions have been validated against ADA §703.3.1 standards.  
-Repository source remains available for local use and contribution.
+> **🚧 Temporarily Offline**  
+> BrailleDaddy is currently undergoing critical updates to ensure full ADA §703.3.1 compliance. We're implementing corrections to braille spacing, capitalization rules for permanent signage, and SVG export accuracy. The tool will be back online once all changes are validated. In the meantime, you can still run it locally from this repository.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.1.0-green.svg)
@@ -12,157 +10,160 @@ Repository source remains available for local use and contribution.
 
 ---
 
-## Overview
+## What is BrailleDaddy?
 
-BrailleDaddy is a professional web-based Unified English Braille (UEB) translation tool with precise, ADA-compliant export capabilities for creating accessible signage. It supports both Grade 1 (uncontracted) and Grade 2 (contracted) braille and provides true-scale millimeter output suitable for direct engraving or embossing.
+BrailleDaddy is a professional, web-based Unified English Braille (UEB) translator designed for creating ADA-compliant tactile signage. It supports both Grade 1 (uncontracted) and Grade 2 (contracted) braille with true-scale millimeter output—ready for direct engraving, embossing, or CNC routing.
 
----
-
-## Key Features
-
-### Translation Engine
-- Grade 1 (Uncontracted) and Grade 2 (Contracted) UEB translation  
-- Real-time translation with intelligent character handling  
-- Multi-line sign mode with ADA-compliant spacing  
-- Comprehensive contraction and shortform database  
-- Correct handling of numbers, punctuation, and capitalization indicators  
-
-### Visualization
-- **Unicode View** – displays standard braille Unicode characters (U+2800–U+28FF)  
-- **Dot Pattern View** – renders a visual 6-dot layout using accurate millimeter spacing  
-- High-DPI and fullscreen support for detailed verification  
-
-### Import and Export
-**Import formats:**  
-- Plain text (.txt)  
-- Braille Ready Format (.brf) with optional back-translation  
-- Drag-and-drop import  
-
-**Export formats:**  
-- **SVG:** true millimeter scaling, no DPI conversion  
-- **BRF:** compatible with embossers  
-- **Text:** translated or plain text output  
-- **Clipboard:** quick copy support  
-
-### ADA Compliance
-- Fully compliant with ADA §703.3.1 for tactile braille signs  
-- Default export settings use:
-  - Dot diameter: 1.5–1.6 mm  
-  - Dot spacing: 2.3–2.5 mm within a cell  
-  - Cell spacing: 6.1–7.6 mm horizontally  
-  - Line spacing: 10.0–10.2 mm vertically  
-- Includes built-in reference for ADA physical requirements  
-- Enforces use of Grade 2 braille for permanent signs  
+**No installations. No dependencies. Just accurate, compliant braille.**
 
 ---
 
-## Current Status
+## Features
 
-The live demo (GitHub Pages deployment) is temporarily disabled while the following improvements are completed:
+### 🔤 Translation Engine
+- **Grade 1 & Grade 2 UEB** translation with real-time preview
+- **Multi-line sign mode** with automatic ADA-compliant spacing (10.0–10.2mm)
+- Intelligent handling of contractions, numbers, punctuation, and capitalization
+- Special rules for permanent signage vs. documents
 
-- Verification of spacing tolerances against ADA §703.3.1  
-- Revised capitalization logic for tactile signage  
-- Updated export dialog with real-time validation  
-- Improved SVG metadata for true-scale assurance  
-- UI cleanup and accessibility refinements  
+### 👁️ Visualization
+- **Unicode View:** Standard braille characters (⠀–⣿)
+- **Dot Pattern View:** Visual 6-dot cell layout with precise spacing
+- Fullscreen mode for detailed verification
+- High-DPI support
 
-A new release (v1.2.0) will be published once these corrections are complete.
+### 📥 Import & Export
+
+**Import:**
+- Plain text (.txt)
+- Braille Ready Format (.brf)
+- Drag-and-drop support
+
+**Export:**
+- **SVG** with true millimeter scaling (no DPI conversions)
+- **BRF** for embossers
+- **Plain text** or **Unicode braille**
+- **Copy to clipboard**
+
+### ✅ ADA Compliance
+
+Built-in compliance with **ADA §703.3.1** for permanent room identification:
+
+| Requirement | Specification |
+|-------------|---------------|
+| **Dot diameter** | 1.5–1.6mm |
+| **Dot spacing (within cell)** | 2.3–2.5mm |
+| **Cell spacing (horizontal)** | 6.1–7.6mm |
+| **Line spacing (vertical)** | 10.0–10.2mm |
+| **Dot height** | 0.6–0.9mm raised |
+| **Grade requirement** | Grade 2 mandatory for permanent signs |
+
+**Special capitalization rules for signs:**
+- Tactile text: ALL CAPS (required)
+- Braille: NO capital indicators for first word (implied as title)
+- Exception: DO capitalize proper nouns, initials, acronyms
 
 ---
 
-## Local Use
+## Why Offline?
 
-You can still run BrailleDaddy locally:
+We discovered inconsistencies in how the tool handles:
+1. **Capitalization** for permanent signage vs. documents
+2. **Spacing validation** edge cases
+3. **SVG export metadata** for true-scale verification
 
+Rather than leave incorrect information online, we've taken the tool down until **v1.2.0** is ready with validated corrections.
+
+---
+
+## Run Locally
 ```bash
+# Clone the repository
 git clone https://github.com/castironsill/brailledaddy.git
 cd brailledaddy
-Open index.html in a modern browser to use the tool offline.
-Once the project is republished, it will return to:
-https://castironsill.github.io/brailledaddy
-Technical Details
 
-Written in vanilla JavaScript (no dependencies)
+# Open in browser
+open index.html
+# or just double-click index.html
+```
 
-Canvas-based rendering with requestAnimationFrame
+**Requirements:** Any modern browser (Chrome, Firefox, Safari, Edge)
 
-Responsive design using CSS Grid and custom properties
+---
 
-Compatible across major browsers
+## Technical Details
 
-Keyboard and screen reader accessible
+- **Zero dependencies** – vanilla JavaScript
+- **Canvas rendering** with `requestAnimationFrame`
+- **Responsive design** using CSS Grid
+- **Screen reader accessible**
+- **Keyboard navigation** support
 
-Embosser Compatibility
+### Tested Embossers
+- ViewPlus (Tiger, Elite, Premier)
+- Index Braille (Basic-D, Everest)
+- Enabling Technologies (Romeo, Juliet)
+- Any system accepting SVG or BRF input
 
-Confirmed to function correctly with:
+---
 
-ViewPlus embossers
+## ADA Sign Requirements Summary
 
-Index Braille (Basic-D, Everest, Fanfold)
+**For permanent room identification signs:**
 
-Enabling Technologies (Romeo, Juliet)
+✅ **MUST use Grade 2 braille**  
+✅ Tactile text in ALL CAPS  
+✅ Braille positioned 3/8" (9.5mm) below tactile text baseline  
+✅ Mounted 48"–60" from floor to baseline  
+✅ Located on latch side of door  
+✅ 3" minimum clearance from door frame  
+✅ Non-glare, matte finish  
+✅ Dots must be domed/rounded (not flat)
 
-Any system accepting SVG or BRF input
+❌ **Do NOT** use all capitals in braille for emphasis  
+❌ **Do NOT** add capital indicators to first word in sign braille
 
-ADA Sign Requirements
+---
 
-BrailleDaddy aligns with current ADA Standards for Accessible Design:
+## Contributing
 
-Grade 2 braille required for permanent signage
+We welcome contributions! Priority areas:
 
-Dots raised 0.6–0.9 mm, domed or rounded
+- Additional braille codes (Nemeth, Music Braille)
+- Multi-language support
+- Batch export features
+- Additional validation tools
 
-Minimum 3/8" separation between tactile text and braille
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-Mounting height: 48"–60" to the baseline of the lowest tactile character
+---
 
-Minimum 3" clearance from door frame
+## Known Issues
 
-Non-glare finish required
+- Safari may require double-click for file input
+- Some Grade 2 contractions pending verification
+- Batch export in development
 
-Contributing
+**Report bugs:** [GitHub Issues](https://github.com/castironsill/brailledaddy/issues)  
+**Discuss features:** [GitHub Discussions](https://github.com/castironsill/brailledaddy/discussions)
 
-Contributions are welcome. Focus areas include:
+---
 
-Additional braille systems (Nemeth, Music, etc.)
+## License
 
-Multi-language support
+MIT License – see [LICENSE](LICENSE) for details.
 
-Batch export capabilities
+---
 
-Additional export and verification tools
+## Acknowledgments
 
-Before contributing, review the Contributing Guidelines
-.
+- **International Council on English Braille (ICEB)** for UEB specifications
+- **ADA Standards for Accessible Design (2010)**
+- The blind and visually impaired community for invaluable feedback
+- **Perkins School for the Blind** for reference materials
 
-License
+---
 
-This project is licensed under the MIT License. See the LICENSE
- file for details.
+**BrailleDaddy is committed to accuracy, accessibility, and compliance in tactile signage design.**
 
-Known Issues
-
-Safari may require a second click for file input
-
-Some Grade 2 contractions still pending verification
-
-Batch export feature remains in development
-
-Support
-
-Report issues: GitHub Issues
-
-Discuss development: GitHub Discussions
-
-Acknowledgments
-
-Unified English Braille (UEB) specification, International Council on English Braille (ICEB)
-
-ADA Standards for Accessible Design (2010)
-
-The blind and visually impaired community for ongoing feedback
-
-Perkins School for the Blind for reference materials
-
-BrailleDaddy is developed to support accessibility, accuracy, and compliance in tactile signage design.
-Source code remains public while the live tool undergoes refinement.
+*Version 1.2.0 coming soon with verified ADA compliance.*
