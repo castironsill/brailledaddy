@@ -1,11 +1,9 @@
 # BrailleDaddy
 
-> **🚧 Temporarily Offline**  
-> BrailleDaddy is currently undergoing critical updates to ensure full ADA §703.3.1 compliance. We're implementing corrections to braille spacing, capitalization rules for permanent signage, and SVG export accuracy. The tool will be back online once all changes are validated. In the meantime, you can still run it locally from this repository.
-
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.1.0-green.svg)
+![Version](https://img.shields.io/badge/version-1.2.0-green.svg)
 ![UEB](https://img.shields.io/badge/UEB-Grade%201%20%26%202-brightgreen.svg)
+![Engine](https://img.shields.io/badge/engine-liblouis-blueviolet.svg)
 ![ADA Compliant](https://img.shields.io/badge/ADA-Compliant-blue.svg)
 
 ---
@@ -14,7 +12,9 @@
 
 BrailleDaddy is a professional, web-based Unified English Braille (UEB) translator designed for creating ADA-compliant tactile signage. It supports both Grade 1 (uncontracted) and Grade 2 (contracted) braille with true-scale millimeter output—ready for direct engraving, embossing, or CNC routing.
 
-**No installations. No dependencies. Just accurate, compliant braille.**
+As of **v1.2.0**, translation is powered by **[liblouis](https://github.com/liblouis/liblouis)** — the open-source braille engine used by BrailleBlaster and most professional transcription software — compiled to run entirely in your browser. There is no server and no network call: the engine and the official UEB tables are bundled with the page, so your text never leaves your device.
+
+**No installations. No accounts. Just accurate, standards-based braille.**
 
 ---
 
@@ -65,14 +65,17 @@ Built-in compliance with **ADA §703.3.1** for permanent room identification:
 
 ---
 
-## Why Offline?
+## What changed in v1.2.0
 
-We discovered inconsistencies in how the tool handles:
-1. **Capitalization** for permanent signage vs. documents
-2. **Spacing validation** edge cases
-3. **SVG export metadata** for true-scale verification
-
-Rather than leave incorrect information online, we've taken the tool down until **v1.2.0** is ready with validated corrections.
+The earlier releases used a hand-written contraction table that produced
+incorrect Grade 2 UEB in a number of cases (contractions applied across letter
+boundaries, contractions UEB had retired such as *to*/*into*/*by*, missing
+number/letter signs, and incomplete capitalization rules). v1.2.0 replaces that
+table wholesale with **liblouis** and the official `en-ueb-g1`/`en-ueb-g2`
+tables, so the output now matches professional transcription tools. The BRF
+import/export was also rebuilt on the standard Braille ASCII table, and the
+in-page accessibility was improved (visible keyboard focus, ARIA labelling,
+reduced-motion support).
 
 ---
 
@@ -82,10 +85,13 @@ Rather than leave incorrect information online, we've taken the tool down until 
 git clone https://github.com/castironsill/brailledaddy.git
 cd brailledaddy
 
-# Open in browser
+# Open in browser — double-click index.html, or:
 open index.html
-# or just double-click index.html
 ```
+
+The translator works fully offline straight from `index.html` (no build step,
+no server). If you want the favicons/manifest to resolve too, serve the folder
+over HTTP instead, e.g. `python -m http.server` and open <http://localhost:8000>.
 
 **Requirements:** Any modern browser (Chrome, Firefox, Safari, Edge)
 
@@ -93,11 +99,13 @@ open index.html
 
 ## Technical Details
 
-- **Zero dependencies** – vanilla JavaScript
-- **Canvas rendering** with `requestAnimationFrame`
+- **Vanilla JavaScript** UI — no framework, no build step
+- **Translation by [liblouis](https://github.com/liblouis/liblouis)** (LGPLv3), compiled to JavaScript and vendored under [`vendor/liblouis/`](vendor/liblouis/) along with the official UEB tables (inlined so the app runs offline, with no network request)
+- **Canvas rendering** for the dot-pattern view
 - **Responsive design** using CSS Grid
-- **Screen reader accessible**
-- **Keyboard navigation** support
+- **Accessible**: visible keyboard focus, ARIA labelling, and `prefers-reduced-motion` support
+
+> To update the bundled tables after editing `vendor/liblouis/tables/`, run `node tools/gen-tables.js`. Local modifications to the vendored engine are documented in [`vendor/liblouis/PATCHES.md`](vendor/liblouis/PATCHES.md).
 
 ### Tested Embossers
 - ViewPlus (Tiger, Elite, Premier)
@@ -141,7 +149,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 ## Known Issues
 
 - Safari may require double-click for file input
-- Some Grade 2 contractions pending verification
+- Grade 2 BRF *import* is back-translated by liblouis and, like all contracted back-translation, can be approximate for ambiguous words
 - Batch export in development
 
 **Report bugs:** [GitHub Issues](https://github.com/castironsill/brailledaddy/issues)  
@@ -151,12 +159,19 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-MIT License – see [LICENSE](LICENSE) for details.
+BrailleDaddy is released under the MIT License – see [LICENSE](LICENSE).
+
+The bundled translation engine and braille tables are part of
+[liblouis](https://github.com/liblouis/liblouis) and are licensed under the
+LGPLv3 / GPLv3 – see [`vendor/liblouis/LICENSE`](vendor/liblouis/LICENSE). They
+are used unmodified except for the documented buffer-handling fix in
+[`vendor/liblouis/PATCHES.md`](vendor/liblouis/PATCHES.md).
 
 ---
 
 ## Acknowledgments
 
+- **[liblouis](https://github.com/liblouis/liblouis)** and its contributors for the open-source braille translation engine and UEB tables
 - **International Council on English Braille (ICEB)** for UEB specifications
 - **ADA Standards for Accessible Design (2010)**
 - The blind and visually impaired community for invaluable feedback
@@ -165,5 +180,3 @@ MIT License – see [LICENSE](LICENSE) for details.
 ---
 
 **BrailleDaddy is committed to accuracy, accessibility, and compliance in tactile signage design.**
-
-*Version 1.2.0 coming soon with verified ADA compliance.*

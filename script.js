@@ -1,139 +1,78 @@
-// Extended UEB Grade 1 mapping
-const uebGrade1 = {
-    // Letters
-    'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑',
-    'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊', 'j': '⠚',
-    'k': '⠅', 'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕',
-    'p': '⠏', 'q': '⠟', 'r': '⠗', 's': '⠎', 't': '⠞',
-    'u': '⠥', 'v': '⠧', 'w': '⠺', 'x': '⠭', 'y': '⠽', 'z': '⠵',
-    
-    // Numbers (same as letters a-j in braille)
-    '1': '⠁', '2': '⠃', '3': '⠉', '4': '⠙', '5': '⠑',
-    '6': '⠋', '7': '⠛', '8': '⠓', '9': '⠊', '0': '⠚',
-    
-    // Punctuation and special characters
-    ' ': ' ', '.': '⠲', ',': '⠂', ';': '⠆', ':': '⠒',
-    '!': '⠖', '?': '⠦', '"': '⠦', "'": '⠄',
-    '(': '⠐⠣', ')': '⠐⠜', '-': '⠤', '/': '⠸⠌',
-    '@': '⠈⠁', '#': '⠨⠼', '$': '⠈⠎', '%': '⠨⠴',
-    '&': '⠈⠯', '*': '⠐⠔', '+': '⠐⠖', '=': '⠨⠅',
-    '<': '⠐⠅', '>': '⠨⠂', '[': '⠨⠣', ']': '⠨⠜',
-    '{': '⠸⠣', '}': '⠸⠜', '\\': '⠸⠡', '|': '⠳',
-    '_': '⠨⠤', '~': '⠈⠔', '^': '⠘⠡', '`': '⠈⠡',
-    '\n': '\n', '\t': '\t'
-};
+// Translation is performed by liblouis (see vendor/liblouis/braille-engine.js),
+// the same engine used by BrailleBlaster and most professional braille software.
+// This guarantees authoritative Unified English Braille for Grade 1 and Grade 2,
+// including the contraction, capitalization, and number rules that a hand-rolled
+// table cannot reliably get right.
 
-// COMPLETE UEB Grade 2 contractions
-// STEP 2: Replace the deleted uebGrade2Contractions with these organized objects:
+// Dot numbers (1-8) for a Unicode braille cell, derived directly from its code
+// point. The Unicode braille block (U+2800-U+28FF) encodes each raised dot as a
+// bit: dot 1 = bit 0 ... dot 6 = bit 5 (dots 7-8 = bits 6-7, unused in UEB).
+// This is exact for every possible cell — no lookup table to fall out of date.
+function brailleDots(char) {
+    const code = char ? char.codePointAt(0) : 0;
+    if (code < 0x2800 || code > 0x28FF) return []; // space, newline, etc.
+    const bits = code - 0x2800;
+    const dots = [];
+    for (let d = 0; d < 8; d++) {
+        if (bits & (1 << d)) dots.push(d + 1);
+    }
+    return dots;
+}
 
-// 1. Whole word contractions ONLY (single cell, must be standalone words)
-const wholeWordContractions = {
-    'but': '⠃', 'can': '⠉', 'do': '⠙', 'every': '⠑',
-    'from': '⠋', 'go': '⠛', 'have': '⠓', 'just': '⠚',
-    'knowledge': '⠅', 'like': '⠇', 'more': '⠍', 'not': '⠝',
-    'people': '⠏', 'quite': '⠟', 'rather': '⠗', 'so': '⠎',
-    'that': '⠞', 'us': '⠥', 'very': '⠧', 'will': '⠺',
-    'it': '⠭', 'you': '⠽', 'as': '⠵',
-    'child': '⠡', 'shall': '⠩', 'this': '⠹',
-    'which': '⠱', 'out': '⠳', 'still': '⠌',
-    'and': '⠯', 'for': '⠿', 'of': '⠷',
-    'the': '⠮', 'with': '⠾',
-    'be': '⠆', 'enough': '⠢', 'were': '⠶',
-    'his': '⠦', 'in': '⠔', 'was': '⠴'
-};
+// Braille ASCII (BRF) mapping, taken verbatim from liblouis' en-us-brf.dis
+// display table — the standard used by braille embossers. Each pair is
+// [ASCII character, dot numbers]. We build the Unicode-braille <-> BRF maps
+// from this single source of truth so export and import always agree.
+const BRF_DISPLAY = [
+    ['A', '1'], ['B', '12'], ['C', '14'], ['D', '145'], ['E', '15'],
+    ['F', '124'], ['G', '1245'], ['H', '125'], ['I', '24'], ['J', '245'],
+    ['K', '13'], ['L', '123'], ['M', '134'], ['N', '1345'], ['O', '135'],
+    ['P', '1234'], ['Q', '12345'], ['R', '1235'], ['S', '234'], ['T', '2345'],
+    ['U', '136'], ['V', '1236'], ['W', '2456'], ['X', '1346'], ['Y', '13456'],
+    ['Z', '1356'], ['0', '356'], ['1', '2'], ['2', '23'], ['3', '25'],
+    ['4', '256'], ['5', '26'], ['6', '235'], ['7', '2356'], ['8', '236'],
+    ['9', '35'], ["'", '3'], ['@', '4'], ['"', '5'], [',', '6'],
+    ['*', '16'], ['/', '34'], ['-', '36'], ['^', '45'], ['.', '46'],
+    [';', '56'], ['<', '126'], ['%', '146'], [':', '156'], ['[', '246'],
+    ['>', '345'], ['+', '346'], ['_', '456'], ['$', '1246'], ['\\', '1256'],
+    ['?', '1456'], ['!', '2346'], ['#', '3456'], ['&', '12346'], ['(', '12356'],
+    [']', '12456'], [')', '23456'], ['=', '123456']
+];
 
-// 2. Groupsigns (can be used within words)
-const groupsigns = {
-    'ch': '⠡', 'sh': '⠩', 'th': '⠹', 
-    'wh': '⠱', 'ou': '⠳', 'st': '⠌',
-    'gh': '⠣', 'ed': '⠫', 'er': '⠻',
-    'ow': '⠪', 'ar': '⠜', 'ing': '⠬',
-    'en': '⠢', 'in': '⠔', 'to': '⠖', 'by': '⠃⠽',
-'into': '⠔⠖'
-};
+function dotsToBrailleChar(dotStr) {
+    let bits = 0;
+    for (const c of dotStr) bits |= 1 << (parseInt(c, 10) - 1);
+    return String.fromCodePoint(0x2800 + bits);
+}
 
-// 3. Initial-letter contractions (dot 5 + letter)
-const initialLetterContractions = {
-    'day': '⠐⠙', 'ever': '⠐⠑', 'father': '⠐⠋',
-    'here': '⠐⠓', 'know': '⠐⠅', 'lord': '⠐⠇',
-    'mother': '⠐⠍', 'name': '⠐⠝', 'one': '⠐⠕',
-    'once': '⠐⠕', 'part': '⠐⠏', 'question': '⠐⠟', 
-    'right': '⠐⠗', 'some': '⠐⠎', 'time': '⠐⠞', 
-    'under': '⠐⠥', 'work': '⠐⠺', 'young': '⠐⠽'
-};
-
-// 4. Shortforms (common words with special abbreviations)
-const shortforms = {
-    'about': '⠁⠃', 'above': '⠁⠃⠧', 'according': '⠁⠉',
-    'across': '⠁⠉⠗', 'after': '⠁⠋', 'afternoon': '⠁⠋⠝',
-    'afterward': '⠁⠋⠺', 'again': '⠁⠛', 'against': '⠁⠛⠌',
-    'almost': '⠁⠇⠍', 'already': '⠁⠇⠗', 'also': '⠁⠇',
-    'although': '⠁⠇⠹', 'altogether': '⠁⠇⠞', 'always': '⠁⠇⠺',
-    'because': '⠆⠉', 'before': '⠆⠋', 'behind': '⠆⠓',
-    'below': '⠆⠇', 'beneath': '⠆⠝', 'beside': '⠆⠎',
-    'between': '⠆⠞', 'beyond': '⠆⠽', 'blind': '⠃⠇',
-    'braille': '⠃⠗⠇', 'children': '⠡⠝', 'conceive': '⠒⠉⠧',
-    'conceiving': '⠒⠉⠧⠛', 'could': '⠉⠙', 'deceive': '⠙⠉⠧',
-    'deceiving': '⠙⠉⠧⠛', 'declare': '⠙⠉⠇', 'declaring': '⠙⠉⠇⠛',
-    'either': '⠑⠊', 'first': '⠋⠌', 'friend': '⠋⠗',
-    'good': '⠛⠙', 'great': '⠛⠗⠞', 'herself': '⠓⠻⠋',
-    'him': '⠓⠍', 'himself': '⠓⠍⠋', 'immediate': '⠊⠍⠍',
-    'its': '⠭⠎', 'itself': '⠭⠋', 'letter': '⠇⠗',
-    'little': '⠇⠇', 'much': '⠍⠡', 'must': '⠍⠌',
-    'myself': '⠍⠽⠋', 'necessary': '⠝⠑⠉', 'neither': '⠝⠑⠊',
-    'paid': '⠏⠙', 'perhaps': '⠏⠻⠓', 'quick': '⠟⠅',
-    'receive': '⠗⠉⠧', 'receiving': '⠗⠉⠧⠛', 'rejoice': '⠗⠚⠉',
-    'rejoicing': '⠗⠚⠉⠛', 'said': '⠎⠙', 'should': '⠩⠙',
-    'such': '⠎⠡', 'themselves': '⠮⠍⠧⠎', 'today': '⠞⠙',
-    'together': '⠞⠛⠗', 'tomorrow': '⠞⠍', 'tonight': '⠞⠝',
-    'would': '⠺⠙', 'your': '⠽⠗', 'yourself': '⠽⠗⠋',
-    'yourselves': '⠽⠗⠧⠎'
-};
-
-// Final-letter contractions (used at the end of words)
-const finalLetterContractions = {
-    'tion': '⠰⠝', 'ness': '⠰⠎', 'ment': '⠰⠞',
-    'ity': '⠰⠽', 'ation': '⠠⠝', 'ally': '⠠⠽',
-    'ful': '⠰⠇', 'ence': '⠰⠑', 'ance': '⠨⠑',
-    'ound': '⠨⠙', 'ount': '⠨⠞', 'sion': '⠨⠝',
-    'less': '⠨⠎', 'ong': '⠰⠛'
-};
-
-// Braille dot positions mapping
-const brailleDotMap = {
-    '⠁': [1], '⠃': [1,2], '⠉': [1,4], '⠙': [1,4,5], '⠑': [1,5],
-    '⠋': [1,2,4], '⠛': [1,2,4,5], '⠓': [1,2,5], '⠊': [2,4], '⠚': [2,4,5],
-    '⠅': [1,3], '⠇': [1,2,3], '⠍': [1,3,4], '⠝': [1,3,4,5], '⠕': [1,3,5],
-    '⠏': [1,2,3,4], '⠟': [1,2,3,4,5], '⠗': [1,2,3,5], '⠎': [2,3,4], '⠞': [2,3,4,5],
-    '⠥': [1,3,6], '⠧': [1,2,3,6], '⠺': [2,4,5,6], '⠭': [1,3,4,6], '⠽': [1,3,4,5,6],
-    '⠵': [1,3,5,6], '⠯': [1,2,3,4,6], '⠿': [1,2,3,4,5,6], '⠷': [1,2,3,5,6],
-    '⠮': [2,3,4,6], '⠾': [3,4,5,6], '⠡': [1,6], '⠩': [1,4,6], '⠹': [1,4,5,6],
-    '⠱': [1,5,6], '⠳': [1,2,5,6], '⠻': [1,2,4,5,6], '⠣': [1,2,6], '⠬': [3,4,6],
-    '⠫': [1,2,4,6], '⠪': [2,4,6], '⠜': [3,4,5], '⠢': [2,6], '⠲': [2,5,6],
-    '⠂': [2], '⠆': [2,3], '⠒': [2,5], '⠖': [2,3,5], '⠦': [2,3,6],
-    '⠔': [3,5], '⠴': [3,5,6], '⠶': [2,3,5,6], '⠌': [3,4], '⠤': [3,6],
-    '⠨': [4,6], '⠰': [5,6], '⠠': [6], '⠼': [3,4,5,6], '⠸': [4,5,6],
-    '⠘': [4,5], '⠈': [4], '⠐': [5], ' ': []
-};
-
-const numberSign = '⠼';
-const capitalSign = '⠠';
-const letterSign = '⠰';
+const unicodeToBRF = { ' ': ' ', '⠀': ' ', '\n': '\n' };
+const brfToUnicode = { ' ': '⠀', '\n': '\n', '\r': '' };
+for (const [ascii, dotStr] of BRF_DISPLAY) {
+    const cell = dotsToBrailleChar(dotStr);
+    unicodeToBRF[cell] = ascii;
+    brfToUnicode[ascii] = cell;
+    // BRF files may use either case for the letter cells; accept both on import.
+    if (ascii !== ascii.toLowerCase()) brfToUnicode[ascii.toLowerCase()] = cell;
+}
 
 let currentView = 'unicode';
 // Input mode handling
 let inputMode = 'single';
 
-function setInputMode(mode) {
+function setInputMode(mode, clickedBtn) {
     inputMode = mode;
     const textarea = document.getElementById('inputText');
     const helpText = document.getElementById('multiLineHelp');
-    
+
     document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
     });
-    event.target.classList.add('active');
-    
+    if (clickedBtn) {
+        clickedBtn.classList.add('active');
+        clickedBtn.setAttribute('aria-pressed', 'true');
+    }
+
     if (mode === 'multi') {
         textarea.rows = 4;
         helpText.style.display = 'block';
@@ -149,185 +88,40 @@ function translateText() {
     const input = document.getElementById('inputText').value;
     const output = document.getElementById('brailleOutput');
     const grade = document.getElementById('grade').value;
-    
+
     let brailleText = '';
-    
-    if (grade === '1') {
-        brailleText = translateGrade1(input);
-    } else {
-        brailleText = translateGrade2(input);
+    try {
+        brailleText = BrailleEngine.translate(input, grade);
+    } catch (err) {
+        // Engine still loading or failed to initialise.
+        output.textContent = '';
+        document.getElementById('outputCount').textContent = '0 characters';
+        setEngineStatus(BrailleEngine.error
+            ? 'Translation engine failed to load: ' + BrailleEngine.error
+            : 'Loading translation engine…');
+        return;
     }
-    
+
+    setEngineStatus('');
     output.textContent = brailleText;
-    
-    // Update character counts
+
+    // Update character counts (count braille cells, ignoring line breaks)
     document.getElementById('inputCount').textContent = input.length + ' characters';
-    document.getElementById('outputCount').textContent = brailleText.length + ' characters';
-    
+    const cellCount = [...brailleText].filter(c => c !== '\n').length;
+    document.getElementById('outputCount').textContent = cellCount + ' characters';
+
     // Update dots display if active
     if (currentView === 'dots') {
         drawDotPattern();
     }
 }
 
-function translateGrade1(text) {
-    let result = '';
-    let inNumber = false;
-    
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const isDigit = /\d/.test(char);
-        const isUpper = char === char.toUpperCase() && char !== char.toLowerCase();
-        
-        // Add number sign before first digit
-        if (isDigit && !inNumber) {
-            result += numberSign;
-            inNumber = true;
-        } else if (!isDigit && !/[\s\.\,\;\:\!\?\-\(\)\/]/.test(char)) {
-            // Fixed: Reset number mode for more punctuation
-            inNumber = false;
-        }
-        
-        // Add capital sign for uppercase letters
-        if (isUpper && /[A-Z]/.test(char)) {
-            result += capitalSign;
-        }
-        
-        // Translate the character
-        const lowerChar = char.toLowerCase();
-        result += uebGrade1[lowerChar] || char;
-    }
-    
-    return result;
-}
-
-// STEP 4: Replace the old translateGrade2 function with this:
-
-function translateGrade2(text) {
-    let result = '';
-    let position = 0;
-    let inNumber = false;
-    
-    while (position < text.length) {
-        let matched = false;
-        
-        // Get current character
-        const char = text[position];
-        const lowerChar = char.toLowerCase();
-        
-        // Check if this is the start of a word
-        const isWordStart = position === 0 || /[\s\.\,\;\:\!\?\-\(\)\/]/.test(text[position - 1]);
-        
-        // Find the current word
-        let wordEnd = position;
-        while (wordEnd < text.length && !/[\s\.\,\;\:\!\?\-\(\)\/]/.test(text[wordEnd])) {
-            wordEnd++;
-        }
-        const currentWord = text.substring(position, wordEnd);
-        const currentWordLower = currentWord.toLowerCase();
-        
-        // Handle numbers
-        if (/\d/.test(char)) {
-            if (!inNumber) {
-                result += numberSign;
-                inNumber = true;
-            }
-            result += uebGrade1[char];
-            position++;
-            continue;
-        } else if (!/[\s\.\,]/.test(char)) {
-            inNumber = false;
-        }
-        
-        // 1. Check for whole word contractions (only if at word start)
-        if (isWordStart && wholeWordContractions[currentWordLower]) {
-            // Check for capital
-            if (currentWord[0] !== currentWord[0].toLowerCase()) {
-                result += capitalSign;
-            }
-            result += wholeWordContractions[currentWordLower];
-            position += currentWord.length;
-            matched = true;
-        }
-        
-        // 2. Check for shortforms (only if at word start)
-        if (!matched && isWordStart && shortforms[currentWordLower]) {
-            // Check for capital
-            if (currentWord[0] !== currentWord[0].toLowerCase()) {
-                result += capitalSign;
-            }
-            result += shortforms[currentWordLower];
-            position += currentWord.length;
-            matched = true;
-        }
-        
-        // 3. Check for initial-letter contractions (only if at word start)
-        if (!matched && isWordStart && initialLetterContractions[currentWordLower]) {
-            // Check for capital
-            if (currentWord[0] !== currentWord[0].toLowerCase()) {
-                result += capitalSign;
-            }
-            result += initialLetterContractions[currentWordLower];
-            position += currentWord.length;
-            matched = true;
-        }
-        
-        // 4. Check for final-letter contractions
-        if (!matched && currentWord.length > 3) {
-            for (let [ending, contraction] of Object.entries(finalLetterContractions)) {
-                if (currentWordLower.endsWith(ending) && currentWordLower.length > ending.length) {
-                    // Translate the stem
-                    const stem = currentWord.substring(0, currentWord.length - ending.length);
-                    let stemBraille = '';
-                    
-                    // Check if stem needs capital
-                    if (stem[0] !== stem[0].toLowerCase()) {
-                        stemBraille += capitalSign;
-                    }
-                    
-                    // Translate stem character by character (could be improved)
-                    for (let stemChar of stem.toLowerCase()) {
-                        stemBraille += uebGrade1[stemChar] || stemChar;
-                    }
-                    
-                    result += stemBraille + contraction;
-                    position += currentWord.length;
-                    matched = true;
-                    break;
-                }
-            }
-        }
-        
-        // 5. Check for groupsigns (can be used anywhere in a word)
-        if (!matched) {
-            // Try different lengths of groupsigns (from longest to shortest)
-            for (let len = 3; len >= 2; len--) {
-                if (position + len <= text.length) {
-                    const substr = text.substr(position, len).toLowerCase();
-                    if (groupsigns[substr]) {
-                        result += groupsigns[substr];
-                        position += len;
-                        matched = true;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        // 6. Single character fallback
-        if (!matched) {
-            // Check for capital letter
-            if (/[A-Z]/.test(char)) {
-                result += capitalSign;
-            }
-            
-            // Add the character
-            result += uebGrade1[lowerChar] || char;
-            position++;
-        }
-    }
-    
-    return result;
+// Surface engine load/error state in the output panel without blocking the UI.
+function setEngineStatus(message) {
+    const el = document.getElementById('engineStatus');
+    if (!el) return;
+    el.textContent = message || '';
+    el.style.display = message ? 'block' : 'none';
 }
 
 function clearAll() {
@@ -344,25 +138,22 @@ function clearAll() {
     }
 }
 
-function toggleView(view) {
+function toggleView(view, clickedBtn) {
     currentView = view;
     const unicodeBtn = document.querySelector('.view-btn:nth-child(1)');
     const dotsBtn = document.querySelector('.view-btn:nth-child(2)');
     const brailleOutput = document.getElementById('brailleOutput');
     const dotsCanvas = document.getElementById('dotsCanvas');
-    
-    if (view === 'unicode') {
-        unicodeBtn.classList.add('active');
-        dotsBtn.classList.remove('active');
-        brailleOutput.style.display = 'block';
-        dotsCanvas.style.display = 'none';
-    } else {
-        dotsBtn.classList.add('active');
-        unicodeBtn.classList.remove('active');
-        brailleOutput.style.display = 'none';
-        dotsCanvas.style.display = 'block';
-        drawDotPattern();
-    }
+
+    const showDots = view !== 'unicode';
+    dotsBtn.classList.toggle('active', showDots);
+    unicodeBtn.classList.toggle('active', !showDots);
+    dotsBtn.setAttribute('aria-pressed', String(showDots));
+    unicodeBtn.setAttribute('aria-pressed', String(!showDots));
+    brailleOutput.style.display = showDots ? 'none' : 'block';
+    dotsCanvas.style.display = showDots ? 'block' : 'none';
+
+    if (showDots) drawDotPattern();
 }
 
 
@@ -436,7 +227,7 @@ function drawDotPattern() {
     lines.forEach((line, lineIndex) => {
         for (let i = 0; i < line.length; i++) {
             const char = line[i];
-            const dots = brailleDotMap[char] || [];
+            const dots = brailleDots(char);
             const x = padding + i * cellWidth;
             const y = padding + lineIndex * (cellHeight + lineSpacing);
             
@@ -528,6 +319,7 @@ document.addEventListener('DOMContentLoaded', function() {
     inputExpandBtn.className = 'expand-btn';
     inputExpandBtn.innerHTML = '⛶';
     inputExpandBtn.title = 'Expand';
+    inputExpandBtn.setAttribute('aria-label', 'Expand input to fullscreen');
     inputExpandBtn.onclick = () => toggleFullscreen('inputText');
     inputPanel.querySelector('.panel-header').appendChild(inputExpandBtn);
     
@@ -537,6 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
     outputExpandBtn.className = 'expand-btn';
     outputExpandBtn.innerHTML = '⛶';
     outputExpandBtn.title = 'Expand';
+    outputExpandBtn.setAttribute('aria-label', 'Expand braille output to fullscreen');
     outputExpandBtn.onclick = () => {
         if (currentView === 'unicode') {
             toggleFullscreen('brailleOutput');
@@ -573,53 +366,21 @@ function exportAsText() {
     URL.revokeObjectURL(url);
 }
 
-function copyToClipboard() {
+function copyBrailleOutput(clickedBtn) {
     const output = document.getElementById('brailleOutput').textContent;
-    
-    if (!output) {
-        alert('Nothing to copy! Please translate some text first.');
-        return;
-    }
-    
-    navigator.clipboard.writeText(output).then(() => {
-        // Show temporary success message
-        const button = event.target;
-        const originalText = button.textContent;
-        button.textContent = 'Copied!';
-        button.style.backgroundColor = 'var(--accent)';
-        
-        setTimeout(() => {
-            button.textContent = originalText;
-            button.style.backgroundColor = '';
-        }, 2000);
-    }).catch(err => {
-        alert('Failed to copy to clipboard');
-    });
-}
 
-function copyBrailleOutput() {
-    const output = document.getElementById('brailleOutput').textContent;
-    
     if (!output || output.trim() === '') {
         alert('Nothing to copy! Please translate some text first.');
         return;
     }
-    
+
     navigator.clipboard.writeText(output).then(() => {
-        // Get the button that was clicked
-        const buttons = document.querySelectorAll('button');
-        let button = null;
-        buttons.forEach(btn => {
-            if (btn.textContent === 'Copy Braille' || btn.textContent === 'Copied!') {
-                button = btn;
-            }
-        });
-        
+        const button = clickedBtn;
         if (button) {
             const originalText = button.textContent;
             button.textContent = 'Copied!';
             button.style.backgroundColor = 'var(--accent)';
-            
+
             setTimeout(() => {
                 button.textContent = originalText;
                 button.style.backgroundColor = '';
@@ -661,36 +422,22 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('inputCount').textContent = '0 characters';
     document.getElementById('outputCount').textContent = '0 characters';
 });
-// BRF Export
+// BRF Export — Braille Ready Format (ASCII braille for embossers).
 function exportAsBRF() {
     const output = document.getElementById('brailleOutput').textContent;
-    
+
     if (!output) {
         alert('Nothing to export! Please translate some text first.');
         return;
     }
-    
-    // BRF uses ASCII representation of braille
-    // This maps Unicode braille to ASCII BRF format
-    const unicodeToBRF = {
-        '⠀': ' ', '⠁': 'a', '⠃': 'b', '⠉': 'c', '⠙': 'd', '⠑': 'e',
-        '⠋': 'f', '⠛': 'g', '⠓': 'h', '⠊': 'i', '⠚': 'j', '⠅': 'k',
-        '⠇': 'l', '⠍': 'm', '⠝': 'n', '⠕': 'o', '⠏': 'p', '⠟': 'q',
-        '⠗': 'r', '⠎': 's', '⠞': 't', '⠥': 'u', '⠧': 'v', '⠺': 'w',
-        '⠭': 'x', '⠽': 'y', '⠵': 'z', '⠯': '&', '⠿': '=', '⠷': '(',
-        '⠮': '!', '⠾': ')', '⠡': '*', '⠩': '<', '⠹': '%', '⠱': '?',
-        '⠳': ':', '⠻': '$', '⠣': ']', '⠬': '\\', '⠫': '[', '⠪': 'W',
-        '⠜': '@', '⠢': '^', '⠲': '4', '⠂': '1', '⠆': '2', '⠒': '3',
-        '⠖': '5', '⠦': '6', '⠔': '9', '⠴': '0', '⠶': '7', '⠌': '/',
-        '⠤': '8', '⠨': '.', '⠰': ',', '⠠': ';', '⠼': '#', '⠸': '`',
-        '⠘': "'", '⠈': '"', '⠐': '-', ' ': ' ', '\n': '\n'
-    };
-    
+
+    // Map each Unicode braille cell to its Braille ASCII character using the
+    // shared, standards-based table (see BRF_DISPLAY near the top of this file).
     let brfContent = '';
     for (let char of output) {
-        brfContent += unicodeToBRF[char] || char;
+        brfContent += unicodeToBRF[char] !== undefined ? unicodeToBRF[char] : char;
     }
-    
+
     const blob = new Blob([brfContent], { type: 'application/x-brf' });
     const url = URL.createObjectURL(blob);
     
@@ -798,7 +545,7 @@ function exportWithSettings() {
     lines.forEach((line, lineIndex) => {
         for (let charIndex = 0; charIndex < line.length; charIndex++) {
             const char = line[charIndex];
-            const dots = brailleDotMap[char] || [];
+            const dots = brailleDots(char);
             
             // Skip spaces - they don't have dots
             if (char === ' ') continue;
@@ -867,78 +614,31 @@ function handleFileImport(event) {
             const content = e.target.result;
             
             if (fileName.endsWith('.brf')) {
-                // Validate BRF content
-                const validBRF = /^[a-zA-Z0-9\s\!\@\#\$\%\^\&\*\(\)\-\=\[\]\\\;\'\,\.\/\<\>\?\:\"\{\}\|\_\+\`\~\n\r]+$/;
-                if (!validBRF.test(content)) {
-                    alert('This BRF file contains invalid characters and cannot be imported.');
-                    return;
-                }
-                
-                // Convert BRF to Unicode
-                const brfToUnicode = {
-                    ' ': '⠀', 'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑',
-                    'f': '⠋', 'g': '⠛', 'h': '⠓', 'i': '⠊', 'j': '⠚', 'k': '⠅',
-                    'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕', 'p': '⠏', 'q': '⠟',
-                    'r': '⠗', 's': '⠎', 't': '⠞', 'u': '⠥', 'v': '⠧', 'w': '⠺',
-                    'x': '⠭', 'y': '⠽', 'z': '⠵', '&': '⠯', '=': '⠿', '(': '⠷',
-                    '!': '⠮', ')': '⠾', '*': '⠡', '<': '⠩', '%': '⠹', '?': '⠱',
-                    ':': '⠳', '$': '⠻', ']': '⠣', '\\': '⠬', '[': '⠫', 'W': '⠪',
-                    '@': '⠜', '^': '⠢', '4': '⠲', '1': '⠂', '2': '⠆', '3': '⠒',
-                    '5': '⠖', '6': '⠦', '9': '⠔', '0': '⠴', '7': '⠶', '/': '⠌',
-                    '8': '⠤', '.': '⠨', ',': '⠰', ';': '⠠', '#': '⠼', '`': '⠸',
-                    "'": '⠘', '"': '⠈', '-': '⠐', ' ': ' ', '\n': '\n', '\r': ''
-                };
-                
-                // Convert BRF to Unicode for display
+                // Convert BRF (Braille ASCII) to Unicode braille for display,
+                // using the shared standards-based map.
                 let unicodeText = '';
                 for (let char of content) {
-                    unicodeText += brfToUnicode[char] || char;
+                    unicodeText += brfToUnicode[char] !== undefined ? brfToUnicode[char] : char;
                 }
-                
-                // Try to back-translate to regular text
-                let plainText = '';
-                let inNumber = false;
-                
-                for (let i = 0; i < content.length; i++) {
-                    const char = content[i];
-                    
-                    if (char === '#') {
-                        inNumber = true;
-                        continue;
-                    }
-                    
-                    if (char === ' ' || char === '\n' || char === '\r') {
-                        plainText += char;
-                        inNumber = false;
-                        continue;
-                    }
-                    
-                    if (char >= 'a' && char <= 'j') {
-                        if (inNumber) {
-                            plainText += String.fromCharCode(char.charCodeAt(0) - 'a'.charCodeAt(0) + '1'.charCodeAt(0));
-                        } else {
-                            plainText += char;
-                        }
-                    } else if (char >= 'k' && char <= 'z') {
-                        plainText += char;
-                        inNumber = false;
-                    } else {
-                        plainText += char;
-                        if (!/[\.\,]/.test(char)) {
-                            inNumber = false;
-                        }
-                    }
+
+                // Recover editable source text via liblouis back-translation
+                // (far more accurate than a character-by-character guess). Use
+                // the currently selected grade; BRF for signage is usually Grade 2.
+                const grade = document.getElementById('grade').value;
+                let plainText = unicodeText;
+                try {
+                    plainText = BrailleEngine.backTranslate(unicodeText, grade);
+                } catch (err) {
+                    console.warn('Back-translation unavailable, showing braille only:', err);
                 }
-                
-                // Set the input field
+
                 document.getElementById('inputText').value = plainText;
                 document.getElementById('inputCount').textContent = plainText.length + ' characters';
-                
-                // Set the output
+
                 document.getElementById('brailleOutput').textContent = unicodeText;
-                document.getElementById('outputCount').textContent = unicodeText.length + ' characters';
-                
-                // Update dots display if active
+                const cellCount = [...unicodeText].filter(c => c !== '\n').length;
+                document.getElementById('outputCount').textContent = cellCount + ' characters';
+
                 if (currentView === 'dots') {
                     drawDotPattern();
                 }

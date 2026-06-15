@@ -663,3 +663,71 @@ textarea {
     max-width: 100%;
     box-sizing: border-box;
 }
+
+/* ---------------------------------------------------------------------------
+   Accessibility & status polish (v1.2.0)
+   --------------------------------------------------------------------------- */
+
+/* Visible keyboard focus. The app previously had hover styling only, leaving
+   keyboard and screen-reader users with no indication of focus. */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible,
+.view-btn:focus-visible,
+.mode-btn:focus-visible,
+.help-tab:focus-visible,
+.expand-btn:focus-visible,
+.help-button:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    /* Keep the focused control above neighbours so the ring isn't clipped. */
+    position: relative;
+    z-index: 5;
+}
+
+/* Engine load / error banner shown in the output panel. */
+.engine-status {
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: rgba(0, 212, 255, 0.1);
+    border-left: 3px solid var(--accent);
+    color: var(--text-primary);
+}
+
+/* Screen-reader-only helper text. */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Respect users who prefer reduced motion: stop the decorative header shimmer
+   and tone transitions/transforms down so nothing animates unexpectedly. */
+@media (prefers-reduced-motion: reduce) {
+    .header::before {
+        animation: none;
+    }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
+    button:hover,
+    select:hover,
+    .expand-btn:hover,
+    .drag-drop.drag-over {
+        transform: none;
+    }
+}
