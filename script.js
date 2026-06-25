@@ -59,6 +59,136 @@ let currentView = 'unicode';
 // Input mode handling
 let inputMode = 'single';
 
+// ADA tactile-signage mode. When on, translation follows the rules for braille
+// on permanent signs (ADA §703.3.1 / California Building Code 11B-703.3):
+//   * Contracted Grade 2 braille is required, so the grade is forced to 2.
+//   * Capital indicators are used only for narrow cases (first word of a
+//     sentence, proper nouns/names, individual letters, initials, acronyms) and
+//     are never carried over from the ALL-CAPS / Title-Case styling typically
+//     used on a sign's printed face. Those exceptions can't be detected
+//     reliably from arbitrary input, and capitalization is *optional* on
+//     signage, so this mode omits capital indicators entirely by lowercasing
+//     the source text before translation. That keeps signs compliant by default.
+let adaSignMode = false;
+
+// Terms the user has flagged as proper nouns / names / initials / acronyms —
+// the narrow cases where ADA §703.3.1 still permits a capital indicator. Each
+// entry is stored with the exact casing the user wants on the sign; matching
+// against the source text is case-insensitive, and a match is rewritten to the
+// stored casing before translation so its capital indicator survives the
+// otherwise-lowercased output. Everything not on this list is lowercased.
+let adaKeepCaps = [];
+
+function toggleAdaSignMode(checkbox) {
+    adaSignMode = checkbox.checked;
+    const gradeSelect = document.getElementById('grade');
+    const note = document.getElementById('adaSignNote');
+    const panel = document.getElementById('adaKeepCapsPanel');
+
+    if (adaSignMode) {
+        // §703.3.1 mandates contracted (Grade 2) braille for permanent signs.
+        gradeSelect.value = '2';
+        gradeSelect.disabled = true;
+        gradeSelect.setAttribute('aria-disabled', 'true');
+        if (note) note.style.display = 'block';
+        if (panel) panel.style.display = 'block';
+        renderAdaKeepCaps();
+    } else {
+        gradeSelect.disabled = false;
+        gradeSelect.removeAttribute('aria-disabled');
+        if (note) note.style.display = 'none';
+        if (panel) panel.style.display = 'none';
+    }
+
+    translateText();
+}
+
+// Apply ADA capitalization policy: lowercase everything except whole-word
+// occurrences of the kept-capitals terms, which are rewritten to their stored
+// casing. Handles single-word and multi-word terms; matching is case-insensitive.
+function adaApplyCasing(text) {
+    if (!adaKeepCaps.length) return text.toLowerCase();
+
+    const canonical = new Map();   // lowercased term -> exact casing to emit
+    // Longer terms first so e.g. "Main Office" wins over "Main".
+    const terms = adaKeepCaps.slice().sort((a, b) => b.length - a.length);
+    const alternatives = terms.map(function (t) {
+        canonical.set(t.toLowerCase(), t);
+        return t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');   // escape regex metachars
+    });
+
+    const re = new RegExp('\\b(' + alternatives.join('|') + ')\\b', 'gi');
+    let result = '';
+    let last = 0;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+        result += text.slice(last, m.index).toLowerCase();
+        const exact = canonical.get(m[0].toLowerCase());
+        result += exact != null ? exact : m[0];
+        last = m.index + m[0].length;
+        if (m.index === re.lastIndex) re.lastIndex++;   // guard against zero-width loops
+    }
+    result += text.slice(last).toLowerCase();
+    return result;
+}
+
+function addAdaKeepCap() {
+    const input = document.getElementById('adaKeepCapsInput');
+    if (!input) return;
+    // Allow bulk entry separated by commas.
+    input.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+        .forEach(function (term) {
+            const exists = adaKeepCaps.some(function (t) {
+                return t.toLowerCase() === term.toLowerCase();
+            });
+            if (!exists) adaKeepCaps.push(term);
+        });
+    input.value = '';
+    renderAdaKeepCaps();
+    translateText();
+}
+
+function removeAdaKeepCap(term) {
+    adaKeepCaps = adaKeepCaps.filter(function (t) { return t !== term; });
+    renderAdaKeepCaps();
+    translateText();
+}
+
+// Render the kept-capitals terms as removable chips. Built with DOM nodes (not
+// innerHTML) so user-entered terms can't inject markup.
+function renderAdaKeepCaps() {
+    const list = document.getElementById('adaKeepCapsList');
+    if (!list) return;
+    list.textContent = '';
+
+    if (!adaKeepCaps.length) {
+        const empty = document.createElement('span');
+        empty.className = 'ada-keepcaps-empty';
+        empty.textContent = 'No exceptions yet — every capital indicator is omitted.';
+        list.appendChild(empty);
+        return;
+    }
+
+    adaKeepCaps.forEach(function (term) {
+        const chip = document.createElement('span');
+        chip.className = 'ada-chip';
+
+        const label = document.createElement('span');
+        label.textContent = term;
+        chip.appendChild(label);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ada-chip-remove';
+        btn.setAttribute('aria-label', 'Remove ' + term);
+        btn.textContent = '×';
+        btn.onclick = function () { removeAdaKeepCap(term); };
+        chip.appendChild(btn);
+
+        list.appendChild(chip);
+    });
+}
+
 function setInputMode(mode, clickedBtn) {
     inputMode = mode;
     const textarea = document.getElementById('inputText');
@@ -87,11 +217,20 @@ function setInputMode(mode, clickedBtn) {
 function translateText() {
     const input = document.getElementById('inputText').value;
     const output = document.getElementById('brailleOutput');
-    const grade = document.getElementById('grade').value;
+    let grade = document.getElementById('grade').value;
+
+    // In ADA Sign Mode, force Grade 2 and strip capital indicators by
+    // lowercasing the source before translation (see adaSignMode comment above).
+    // The textarea is left untouched — only the braille is affected.
+    let sourceForBraille = input;
+    if (adaSignMode) {
+        grade = '2';
+        sourceForBraille = adaApplyCasing(input);
+    }
 
     let brailleText = '';
     try {
-        brailleText = BrailleEngine.translate(input, grade);
+        brailleText = BrailleEngine.translate(sourceForBraille, grade);
     } catch (err) {
         // Engine still loading or failed to initialise.
         output.textContent = '';

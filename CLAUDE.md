@@ -100,6 +100,24 @@ inherently approximate for some words — that's expected.)
   reduced-motion support intact when changing the UI.
 - ADA spacing defaults in the SVG dialog encode §703.3.1 specs — don't change the
   numbers without a compliance reason.
+- **ADA Sign Mode** (checkbox next to the grade selector, `adaSignMode` in
+  `script.js`): for braille on permanent tactile signs, §703.3.1 / CBC 11B-703.3
+  requires contracted Grade 2 and restricts capital indicators to a few cases
+  (sentence start, proper nouns/names, single letters, initials, acronyms) —
+  never the ALL-CAPS/Title-Case styling on a sign's printed face. Since those
+  exceptions can't be detected from arbitrary input and capitalization is
+  *optional* on signage, the mode omits capitals **by default** and forces
+  grade 2 (the grade select is disabled while on). The textarea is untouched —
+  only the braille is affected — and all exports inherit it because they read
+  the `#brailleOutput` panel that `translateText()` produces.
+  - **Keep-capitals exceptions** (`adaKeepCaps` + `adaApplyCasing()` in
+    `script.js`, `#adaKeepCapsPanel` in the UI, shown only in ADA mode): a chip
+    list of terms the user marks as proper nouns/names/initials/acronyms. Instead
+    of blanket `.toLowerCase()`, `adaApplyCasing()` lowercases everything *except*
+    whole-word (case-insensitive, `\b`-bounded) matches of those terms, which it
+    rewrites to the list's stored casing so their capital indicator survives.
+    Supports multi-word terms (matched longest-first) and comma-separated bulk
+    add. The list lives in memory only (not persisted across reloads).
 
 ## Verifying changes (how this was tested)
 

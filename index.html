@@ -98,7 +98,37 @@
                     <option value="2">Grade 2 (Contracted)</option>
                 </select>
             </div>
+            <div class="control-group ada-mode-group">
+                <label for="adaSignMode" class="toggle-label">
+                    <input type="checkbox" id="adaSignMode" onchange="toggleAdaSignMode(this)">
+                    <span>ADA Sign Mode</span>
+                </label>
+            </div>
             <button onclick="clearAll()">Clear All</button>
+        </div>
+
+        <!-- Shown only while ADA Sign Mode is on -->
+        <div id="adaSignNote" class="ada-sign-note" role="note" style="display: none;">
+            <strong>ADA Sign Mode on.</strong> Output is contracted (Grade&nbsp;2)
+            and capital indicators are omitted — per ADA §703.3.1 / CBC&nbsp;11B-703.3,
+            the uppercase or Title-Case styling on a sign's printed face is
+            <em>not</em> carried into the braille. Capital indicators are permitted
+            (but optional) only for the first word of a sentence, proper nouns and
+            names, individual letters, initials, and acronyms. Add any such terms
+            below to keep their capital indicator.
+        </div>
+
+        <!-- Per-term capitalization exceptions; shown only in ADA Sign Mode -->
+        <div id="adaKeepCapsPanel" class="ada-keepcaps" style="display: none;">
+            <label for="adaKeepCapsInput">Keep capitals for (proper nouns, names, initials, acronyms)</label>
+            <div class="ada-keepcaps-row">
+                <input type="text" id="adaKeepCapsInput" autocomplete="off" spellcheck="false"
+                       placeholder="e.g. Smith, ATM, Room A — type a term and press Enter"
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();addAdaKeepCap();}">
+                <button type="button" onclick="addAdaKeepCap()">Add</button>
+            </div>
+            <p class="ada-keepcaps-hint">Type each term with the exact capitalization you want on the sign. Matching in your text is case-insensitive.</p>
+            <div id="adaKeepCapsList" class="ada-keepcaps-list" aria-live="polite"></div>
         </div>
 
         <!-- Translation Area -->
@@ -677,14 +707,22 @@ document.addEventListener('keydown', function(e) {
                     </div>
                     
                     <div class="ada-requirement">
-                        <h5>Capitalization Rules (§703.3.1)</h5>
+                        <h5>Capitalization Rules (§703.3.1 / CBC 11B-703.3)</h5>
                         <p class="warning">⚠️ Critical for compliance:</p>
+                        <p>The capital indicator "shall only be used before the first word
+                        of sentences, proper nouns and names, individual letters of the
+                        alphabet, initials, and acronyms." Capitalization on braille signage
+                        is <strong>optional</strong> — and the uppercase / Title-Case styling
+                        on a sign's printed face must <strong>not</strong> be reproduced as
+                        capital indicators in the braille.</p>
                         <ul>
-                            <li>Capitalize ONLY the first word of sentences</li>
-                            <li>Capitalize proper nouns and names</li>
-                            <li>Capitalize individual letters used as initials</li>
+                            <li>Capital indicators are allowed only for the cases above</li>
                             <li><strong>Do NOT use all capitals for emphasis</strong></li>
+                            <li>When in doubt, omitting capital indicators is compliant</li>
                         </ul>
+                        <p>💡 Turn on <strong>ADA Sign Mode</strong> (next to the Braille Grade
+                        selector) and the translator handles this for you: it forces Grade 2
+                        and omits capital indicators automatically.</p>
                     </div>
                     
                     <div class="example-box">
