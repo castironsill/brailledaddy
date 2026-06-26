@@ -297,122 +297,158 @@ function toggleView(view, clickedBtn) {
 
 
 
+// Render the braille output as a polished dot-pattern grid. All geometry is
+// derived from a single dot "pitch" so cells stay proportional and centred at
+// any size, and the canvas is resized to its container (HiDPI-aware) on every
+// draw so it stays crisp instead of being stretched from a stale bitmap.
 function drawDotPattern() {
     const canvas = document.getElementById('dotsCanvas');
     const ctx = canvas.getContext('2d');
     const brailleText = document.getElementById('brailleOutput').textContent;
-    
-    if (!brailleText) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        return;
-    }
-    
-    // Settings
-    const cellWidth = 40;
-    const cellHeight = 50;
-    const dotRadius = 3;
-    const padding = 20;
-    const lineSpacing = 25;
-    
-    // Correct dot position mapping for standard braille numbering
-    const dotPositions = {
-        1: {col: 0, row: 0},  // Top left
-        2: {col: 0, row: 1},  // Middle left
-        3: {col: 0, row: 2},  // Bottom left
-        4: {col: 1, row: 0},  // Top right
-        5: {col: 1, row: 1},  // Middle right
-        6: {col: 1, row: 2},  // Bottom right
-        7: {col: 0, row: 3},  // Extension dot left (8-dot braille)
-        8: {col: 1, row: 3}   // Extension dot right (8-dot braille)
-    };
-    
-    // Calculate dimensions
-    const charsPerLine = Math.floor((canvas.parentElement.offsetWidth - 2 * padding) / cellWidth);
-    const lines = [];
-    let currentLine = '';
-    
-    // Split text into lines
-    for (let i = 0; i < brailleText.length; i++) {
-        if (brailleText[i] === '\n' || currentLine.length >= charsPerLine) {
-            lines.push(currentLine);
-            currentLine = brailleText[i] === '\n' ? '' : brailleText[i];
-        } else {
-            currentLine += brailleText[i];
-        }
-    }
-    if (currentLine) lines.push(currentLine);
-    
-    // Set canvas size
-    const targetWidth = canvas.parentElement.offsetWidth;
-    const targetHeight = lines.length * (cellHeight + lineSpacing) + 2 * padding;
 
-    // Get device pixel ratio for high DPI displays
+    const cssVar = (name, fallback) =>
+        (getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
+    const accent = cssVar('--accent', '#00d4ff');
+    const bg = cssVar('--bg-tertiary', '#252525');
+
+    // Geometry — one pitch drives everything (keeps the 2x3 grid proportional).
+    const PITCH = 16;             // centre-to-centre spacing of dots within a cell
+    const DOT_R = PITCH * 0.30;   // dot radius
+    const CELL_W = PITCH;         // two columns span one pitch
+    const CELL_H = PITCH * 2;     // three rows span two pitches
+    const GAP_X = PITCH * 1.5;    // gap between cells
+    const GAP_Y = PITCH * 1.7;    // gap between lines
+    const ADV_X = CELL_W + GAP_X; // horizontal advance per cell
+    const ADV_Y = CELL_H + GAP_Y; // vertical advance per line
+    const PAD = 24;               // canvas padding
+
+    const dotOffset = {           // dot number -> [col, row] in the cell
+        1: [0, 0], 2: [0, 1], 3: [0, 2],
+        4: [1, 0], 5: [1, 1], 6: [1, 2],
+        7: [0, 3], 8: [1, 3]
+    };
+
+    // In fullscreen the canvas is forced to 100vw by CSS (!important), so size
+    // the bitmap to the viewport; otherwise track the panel width.
+    const inFullscreen = canvas.classList.contains('fullscreen');
+    const width = inFullscreen
+        ? Math.max(320, window.innerWidth - 64)
+        : (canvas.parentElement.offsetWidth || 600);
+
     const dpr = window.devicePixelRatio || 1;
 
-    // Set both the canvas internal size AND the CSS size
-    canvas.width = targetWidth * dpr;
-    canvas.height = targetHeight * dpr;
-    canvas.style.width = targetWidth + 'px';
-    canvas.style.height = targetHeight + 'px';
+    const sizeCanvas = (w, h) => {
+        canvas.width = Math.round(w * dpr);
+        canvas.height = Math.round(h * dpr);
+        if (inFullscreen) {
+            // Let the !important CSS govern the display size; just match the bitmap.
+            canvas.style.removeProperty('width');
+            canvas.style.removeProperty('height');
+        } else {
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // reset + apply HiDPI scale
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, w, h);
+    };
 
-    // Scale the drawing context to match device pixel ratio
-    ctx.scale(dpr, dpr);
-    
-    // Clear canvas
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-tertiary');
-    ctx.fillRect(0, 0, targetWidth, targetHeight);
-    
-    // Draw each line
-    lines.forEach((line, lineIndex) => {
-        for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            const dots = brailleDots(char);
-            const x = padding + i * cellWidth;
-            const y = padding + lineIndex * (cellHeight + lineSpacing);
-            
-            // Draw cell background (subtle)
-            ctx.strokeStyle = '#333';
-            ctx.strokeRect(x, y, cellWidth - 5, cellHeight);
-            
-            // Draw all 6 dot positions (faint)
-            for (let dotNum = 1; dotNum <= 6; dotNum++) {
-                const pos = dotPositions[dotNum];
-                const dotX = x + 12 + pos.col * 16;
-                const dotY = y + 10 + pos.row * 14;
-                
-                ctx.fillStyle = '#333';
-                ctx.beginPath();
-                ctx.arc(dotX, dotY, 2, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // Draw active dots
-            dots.forEach(dotNum => {
-                const pos = dotPositions[dotNum];
-                if (!pos) return;
-                
-                const dotX = x + 12 + pos.col * 16;
-                const dotY = y + 10 + pos.row * 14;
-                
-                // Glow effect
-                const gradient = ctx.createRadialGradient(dotX, dotY, 0, dotX, dotY, dotRadius * 1.5);
-                gradient.addColorStop(0, '#00d4ff');
-                gradient.addColorStop(0.5, '#00a8cc');
-                gradient.addColorStop(1, 'transparent');
-                
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(dotX, dotY, dotRadius * 1.5, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Main dot
-                ctx.fillStyle = '#00d4ff';
-                ctx.beginPath();
-                ctx.arc(dotX, dotY, dotRadius, 0, Math.PI * 2);
-                ctx.fill();
-            });
+    if (!brailleText) {
+        sizeCanvas(width, inFullscreen ? Math.max(300, window.innerHeight - 64) : 300);
+        return;
+    }
+
+    // Wrap into visual lines, honouring explicit newlines.
+    const colsPerLine = Math.max(1, Math.floor((width - 2 * PAD) / ADV_X));
+    const lines = [];
+    brailleText.split('\n').forEach(para => {
+        if (para === '') { lines.push(''); return; }
+        for (let i = 0; i < para.length; i += colsPerLine) {
+            lines.push(para.slice(i, i + colsPerLine));
         }
     });
+
+    const contentH = PAD * 2 + lines.length * ADV_Y - GAP_Y;
+    const height = inFullscreen ? Math.max(contentH, window.innerHeight - 64) : Math.max(300, contentH);
+    sizeCanvas(width, height);
+
+    const isCell = ch => {
+        const c = ch.codePointAt(0);
+        return c >= 0x2800 && c <= 0x28FF;
+    };
+
+    lines.forEach((line, li) => {
+        for (let ci = 0; ci < line.length; ci++) {
+            const ch = line[ci];
+            if (!isCell(ch)) continue; // spaces etc. render as a blank gap
+
+            const ox = PAD + ci * ADV_X;
+            const oy = PAD + li * ADV_Y;
+
+            // Subtle cell plate for structure.
+            const pad = DOT_R + 3;
+            roundRect(ctx, ox - pad, oy - pad, CELL_W + 2 * pad, CELL_H + 2 * pad, 6);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+            ctx.fill();
+
+            const active = new Set(brailleDots(ch));
+            for (let d = 1; d <= 6; d++) {
+                const [col, row] = dotOffset[d];
+                const x = ox + col * PITCH;
+                const y = oy + row * PITCH;
+
+                if (active.has(d)) {
+                    // Soft glow.
+                    const grad = ctx.createRadialGradient(x, y, 0, x, y, DOT_R * 2.6);
+                    grad.addColorStop(0, hexToRgba(accent, 0.55));
+                    grad.addColorStop(1, hexToRgba(accent, 0));
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(x, y, DOT_R * 2.6, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Solid dot.
+                    ctx.fillStyle = accent;
+                    ctx.beginPath();
+                    ctx.arc(x, y, DOT_R, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Highlight for a raised, tactile look.
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+                    ctx.beginPath();
+                    ctx.arc(x - DOT_R * 0.3, y - DOT_R * 0.3, DOT_R * 0.32, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Faint placeholder so empty positions read as part of the cell.
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+                    ctx.beginPath();
+                    ctx.arc(x, y, DOT_R * 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+    });
+}
+
+// Trace a rounded rectangle path (no fill/stroke — caller decides).
+function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+// Convert "#rgb"/"#rrggbb" to an rgba() string at the given alpha.
+function hexToRgba(hex, alpha) {
+    hex = (hex || '').replace('#', '').trim();
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const n = parseInt(hex, 16);
+    if (hex.length !== 6 || isNaN(n)) return 'rgba(0, 212, 255, ' + alpha + ')';
+    return 'rgba(' + ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ', ' + alpha + ')';
 }
 
 // Add fullscreen/popup functionality
@@ -560,6 +596,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize with empty counts
     document.getElementById('inputCount').textContent = '0 characters';
     document.getElementById('outputCount').textContent = '0 characters';
+
+    // Reflow the dot-pattern canvas on resize so it re-wraps and stays crisp
+    // instead of being stretched from a stale bitmap. Debounced to avoid
+    // redrawing on every resize event.
+    let resizeTimer;
+    window.addEventListener('resize', function () {
+        if (currentView !== 'dots') return;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(drawDotPattern, 120);
+    });
 });
 // BRF Export — Braille Ready Format (ASCII braille for embossers).
 function exportAsBRF() {
