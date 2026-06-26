@@ -825,6 +825,36 @@ textarea:focus-visible,
     border: 0;
 }
 
+/* Skip-to-content link: hidden until focused (WCAG 2.4.1 Bypass Blocks). */
+.skip-link {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translateY(-120%);
+    z-index: 10001;
+    margin: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: var(--accent);
+    color: var(--bg-primary);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: transform 0.2s ease;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+    outline: 3px solid #ffffff;
+    outline-offset: 2px;
+}
+
+/* Ensure placeholder text meets AA contrast on the dark inputs. */
+::placeholder {
+    color: #9a9a9a;
+    opacity: 1;
+}
+
 /* Site footer */
 .site-footer {
     background-color: var(--bg-secondary);

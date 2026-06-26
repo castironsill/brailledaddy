@@ -451,6 +451,64 @@ function hexToRgba(hex, alpha) {
     return 'rgba(' + ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ', ' + alpha + ')';
 }
 
+// --- Accessible dialog helpers --------------------------------------------
+// Shared by the export-settings dialog and the help modal so both: move focus
+// into the dialog on open, trap Tab within it, close on Escape, and restore
+// focus to the triggering control on close (WCAG 2.4.3 Focus Order, 4.1.2).
+const _dialogState = { opener: null, keyHandler: null };
+
+function _focusableIn(container) {
+    return Array.from(container.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]),' +
+        ' textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(el => el.getClientRects().length > 0); // visible only
+}
+
+function openDialog(dialogId, onClose) {
+    const dialog = document.getElementById(dialogId);
+    if (!dialog) return;
+    _dialogState.opener = document.activeElement;
+    dialog.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    const focusables = _focusableIn(dialog);
+    (focusables[0] || dialog).focus();
+
+    _dialogState.keyHandler = function (e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            closeDialog(dialogId, onClose);
+            return;
+        }
+        if (e.key !== 'Tab') return;
+        const items = _focusableIn(dialog);
+        if (!items.length) return;
+        const first = items[0], last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault(); last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault(); first.focus();
+        }
+    };
+    document.addEventListener('keydown', _dialogState.keyHandler, true);
+}
+
+function closeDialog(dialogId, onClose) {
+    const dialog = document.getElementById(dialogId);
+    if (!dialog) return;
+    dialog.style.display = 'none';
+    document.body.style.overflow = 'auto';
+    if (_dialogState.keyHandler) {
+        document.removeEventListener('keydown', _dialogState.keyHandler, true);
+        _dialogState.keyHandler = null;
+    }
+    if (typeof onClose === 'function') onClose();
+    if (_dialogState.opener && typeof _dialogState.opener.focus === 'function') {
+        _dialogState.opener.focus();
+    }
+    _dialogState.opener = null;
+}
+
 // Add fullscreen/popup functionality
 function toggleFullscreen(elementId) {
     const element = document.getElementById(elementId);
@@ -597,6 +655,11 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('inputCount').textContent = '0 characters';
     document.getElementById('outputCount').textContent = '0 characters';
 
+    // Hide purely decorative icons (braille glyphs, search/info symbols) from
+    // assistive tech — their buttons/labels already carry the real text.
+    document.querySelectorAll('.tab-icon, .search-icon, .info-icon')
+        .forEach(el => el.setAttribute('aria-hidden', 'true'));
+
     // Reflow the dot-pattern canvas on resize so it re-wraps and stays crisp
     // instead of being stretched from a stale bitmap. Debounced to avoid
     // redrawing on every resize event.
@@ -643,13 +706,13 @@ function exportAsSVG() {
         return;
     }
     
-    // Show the dialog
-    document.getElementById('adaSettingsDialog').style.display = 'flex';
+    // Show the dialog (with focus management + trap + Escape-to-close).
+    openDialog('adaSettingsDialog');
 }
 
 // Close ADA dialog
 function closeADADialog() {
-    document.getElementById('adaSettingsDialog').style.display = 'none';
+    closeDialog('adaSettingsDialog');
 }
 
 // Reset to ADA defaults

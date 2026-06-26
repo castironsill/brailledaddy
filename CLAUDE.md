@@ -98,7 +98,13 @@ inherently approximate for some words — that's expected.)
 - Output character counts exclude `\n` (they count braille cells).
 - Accessibility matters here (the audience includes blind/low-vision users): keep
   visible keyboard focus, ARIA labels/roles, `aria-pressed` on toggles, and
-  reduced-motion support intact when changing the UI.
+  reduced-motion support intact when changing the UI. The site targets **WCAG 2.1
+  AA** (the bar courts/DOJ use for ADA web accessibility).
+- **Dialogs/modals** (`#helpModal`, `#adaSettingsDialog`) must go through the shared
+  `openDialog(id, onClose)` / `closeDialog(id, onClose)` helpers in `script.js`:
+  they set focus into the dialog, trap Tab, close on Escape, and restore focus to
+  the opener. Both carry `role="dialog" aria-modal="true" aria-labelledby` →
+  their heading id. Don't reintroduce raw `style.display` toggling for these.
 - ADA spacing defaults in the SVG dialog encode §703.3.1 specs — don't change the
   numbers without a compliance reason.
 - **ADA Sign Mode** (checkbox next to the grade selector, `adaSignMode` in
