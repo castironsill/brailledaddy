@@ -38,6 +38,7 @@ engraving/embossing), BRF (for embossers), and plain text, plus TXT/BRF import.
 | `tools/gen-tables.js` | Regenerates `vendor/liblouis/tables.js` from the table source files. Run `node tools/gen-tables.js` after editing tables. |
 | `README.md` | Public-facing project readme. |
 | `CNAME`, `.nojekyll`, `robots.txt`, `sitemap.xml`, `site.webmanifest` | GitHub Pages / SEO / PWA config. |
+| `404.html` | Branded `noindex` not-found page (GitHub Pages serves it automatically). |
 | `favicon*.png/.ico`, `apple-touch-icon.png`, `preview.png` | Icons + social preview image. |
 | `LICENSE` | MIT (the app). liblouis has its own LICENSE under `vendor/liblouis/`. |
 

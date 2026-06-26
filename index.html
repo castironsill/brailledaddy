@@ -8,27 +8,36 @@
     <meta name="google-site-verification" content="SCTF78gcSIxeEtyqO6w_JN6Zk2708NOl95fZFnwhdoM">
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Free online UEB braille translator with ADA-compliant SVG export. Create Grade 1 and Grade 2 braille for signs with true-scale millimeter output. No scaling needed!">
-    <meta name="keywords" content="braille translator, UEB, unified english braille, ADA signs, braille generator, Grade 2 braille, Grade 1 braille, accessible signage, braille converter, ADA compliant, braille dots, tactile signs, SVG braille, BRF converter, online braille tool">
+    <meta name="description" content="Free online UEB braille translator with an ADA Sign Mode and true-scale SVG export. Convert English to Grade 1 &amp; 2 braille for tactile signs — millimeter-accurate SVG for engraving and BRF for embossers.">
+    <meta name="keywords" content="braille translator, UEB, unified english braille, ADA signs, ADA braille, braille generator, Grade 2 braille, Grade 1 braille, accessible signage, braille converter, ADA compliant, braille dots, tactile signs, SVG braille, BRF converter, online braille tool, braille capitalization rules">
     <meta name="author" content="castironsill">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="language" content="English">
-    
+    <meta name="application-name" content="BrailleDaddy">
+    <meta name="theme-color" content="#00d4ff">
+    <meta name="color-scheme" content="dark light">
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="BrailleDaddy">
+    <meta property="og:locale" content="en_US">
     <meta property="og:url" content="https://brailledaddy.com/">
-    <meta property="og:title" content="BrailleDaddy - Professional UEB Braille Translation Tool">
-    <meta property="og:description" content="Create ADA-compliant braille signs with true-scale SVG export. Free online UEB translator for Grade 1 and Grade 2 braille.">
+    <meta property="og:title" content="BrailleDaddy — Free UEB Braille Translator for ADA-Compliant Signs">
+    <meta property="og:description" content="Create ADA-compliant braille signs with true-scale SVG export. Free online UEB translator for Grade 1 and Grade 2 braille, with an ADA Sign Mode that handles capitalization rules for you.">
     <meta property="og:image" content="https://brailledaddy.com/preview.png">
-    
+    <meta property="og:image:width" content="2487">
+    <meta property="og:image:height" content="1196">
+    <meta property="og:image:alt" content="BrailleDaddy interface showing English text translated into Unified English Braille">
+
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://brailledaddy.com/">
-    <meta property="twitter:title" content="BrailleDaddy - Professional UEB Braille Translation Tool">
-    <meta property="twitter:description" content="Create ADA-compliant braille signs with true-scale SVG export. Free online UEB translator.">
-    <meta property="twitter:image" content="https://brailledaddy.com/preview.png">
-    
-    <title>BrailleDaddy - Professional UEB Braille Translator | ADA Compliant SVG Export</title>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://brailledaddy.com/">
+    <meta name="twitter:title" content="BrailleDaddy — Free UEB Braille Translator for ADA-Compliant Signs">
+    <meta name="twitter:description" content="Create ADA-compliant braille signs with true-scale SVG export. Free online UEB translator for Grade 1 and Grade 2 braille, with an ADA Sign Mode.">
+    <meta name="twitter:image" content="https://brailledaddy.com/preview.png">
+    <meta name="twitter:image:alt" content="BrailleDaddy interface showing English text translated into Unified English Braille">
+
+    <title>BrailleDaddy — Free UEB Braille Translator for ADA-Compliant Signs | Grade 1 &amp; 2</title>
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://brailledaddy.com/">
@@ -51,11 +60,19 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "BrailleDaddy",
-      "description": "Professional Unified English Braille (UEB) translator with ADA-compliant SVG export for creating accessible signage",
+      "description": "Professional Unified English Braille (UEB) translator with an ADA Sign Mode and true-scale SVG export for creating ADA-compliant accessible signage.",
       "url": "https://brailledaddy.com/",
       "applicationCategory": "AccessibilityApplication",
       "operatingSystem": "Any",
       "browserRequirements": "Requires JavaScript enabled",
+      "inLanguage": "en",
+      "isAccessibleForFree": true,
+      "softwareVersion": "1.2.0",
+      "datePublished": "2026-06-15",
+      "dateModified": "2026-06-25",
+      "image": "https://brailledaddy.com/preview.png",
+      "keywords": "braille translator, UEB, ADA signs, Grade 2 braille, tactile signage, SVG braille, BRF",
+      "license": "https://opensource.org/licenses/MIT",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -64,15 +81,75 @@
       "featureList": [
         "Grade 1 and Grade 2 UEB translation",
         "Real-time braille conversion",
+        "ADA Sign Mode with automatic capital-indicator handling per ADA §703.3.1",
         "ADA-compliant SVG export with true millimeter scaling",
         "Multi-line sign support",
         "BRF file import/export",
+        "Dot-pattern preview",
         "Comprehensive help system"
       ],
       "creator": {
         "@type": "Person",
         "name": "castironsill"
       }
+    }
+    </script>
+
+    <!-- FAQ structured data (mirrors the in-app help content) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Do ADA braille signs use capital letters?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In most cases, no. On ADA-compliant tactile signs the capital indicator is used only before the first word of a sentence, proper nouns and names, individual letters of the alphabet, initials, and acronyms (ADA §703.3.1 / California Building Code 11B-703.3). The uppercase or title-case styling on the printed face of a sign is not carried into the braille, and capitalization on braille signage is optional. BrailleDaddy's ADA Sign Mode applies this automatically."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What grade of braille is required for ADA signs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ADA §703.3.1 requires contracted Grade 2 Unified English Braille (UEB) for permanent signs. BrailleDaddy supports both Grade 1 (uncontracted) and Grade 2 (contracted), and forces Grade 2 when ADA Sign Mode is enabled."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the ADA braille dot dimensions and spacing requirements?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "ADA §703.3.1 specifies a dot base diameter of 1.5–1.6 mm, dot height of 0.6–0.9 mm, 2.3–2.5 mm between dots within a cell, 6.1–7.6 mm between cells (dot 1 to dot 1), and 10.0–10.2 mm between lines. BrailleDaddy's SVG export uses these measurements at true millimeter scale."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is BrailleDaddy free, and is my text private?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. BrailleDaddy is a free, browser-based UEB braille translator. Translation runs entirely in your browser using the open-source liblouis engine, so your text never leaves your device and the tool works offline."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between Grade 1 and Grade 2 braille?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Grade 1 (uncontracted) braille spells every word out letter by letter. Grade 2 (contracted) braille uses about 180 contractions and shortforms to save space and speed reading; it is the standard required for ADA signage."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I export braille for an embosser or sign engraver?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. BrailleDaddy exports BRF (Braille Ready Format) for embossers, true-millimeter-scale SVG for engraving or CNC routing, and plain text. It can also import TXT and BRF files."
+          }
+        }
+      ]
     }
     </script>
 </head>
@@ -274,6 +351,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Site footer: provides crawlable, descriptive content for SEO and the
+         required liblouis attribution. -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <section class="footer-about">
+                <h2>About BrailleDaddy</h2>
+                <p>
+                    <strong>BrailleDaddy</strong> is a free, browser-based
+                    <strong>Unified English Braille (UEB)</strong> translator built for making
+                    <strong>ADA-compliant tactile signs</strong>. Convert English to
+                    <strong>Grade&nbsp;1 (uncontracted)</strong> or
+                    <strong>Grade&nbsp;2 (contracted)</strong> braille, preview the dot pattern,
+                    and export <strong>true-millimeter-scale SVG</strong> for engraving,
+                    <strong>BRF</strong> for embossers, or plain text.
+                </p>
+                <p>
+                    Turn on <strong>ADA Sign Mode</strong> to follow ADA §703.3.1 / CBC&nbsp;11B-703.3
+                    signage rules automatically — it produces contracted Grade&nbsp;2 braille and omits
+                    capital indicators except for the terms you flag as proper nouns, names, initials,
+                    or acronyms. Translation runs entirely in your browser, so your text never leaves
+                    your device and the tool works offline.
+                </p>
+            </section>
+            <nav class="footer-nav" aria-label="Footer">
+                <h2>Resources</h2>
+                <ul>
+                    <li><button type="button" class="link-button" onclick="openHelpModal()">Help &amp; ADA braille guide</button></li>
+                    <li><a href="https://github.com/castironsill/brailledaddy" target="_blank" rel="noopener">Source code on GitHub</a></li>
+                    <li><a href="https://www.access-board.gov/ada/guides/chapter-7-signs/" target="_blank" rel="noopener noreferrer">U.S. Access Board — ADA signs</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="footer-legal">
+            <p>
+                Braille translation is powered by
+                <a href="https://github.com/liblouis/liblouis" target="_blank" rel="noopener noreferrer">liblouis</a>
+                (LGPLv3/GPLv3). BrailleDaddy is open source under the MIT License.
+            </p>
+            <p>&copy; 2026 BrailleDaddy. Always have braille signage verified before production.</p>
+        </div>
+    </footer>
 
     <!-- Translation engine: vendored liblouis (asm.js) + UEB tables, loaded in order. -->
     <script src="vendor/liblouis/build-no-tables-utf16.js"></script>
