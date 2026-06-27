@@ -39,6 +39,7 @@ engraving/embossing), BRF (for embossers), and plain text, plus TXT/BRF import.
 | `README.md` | Public-facing project readme. |
 | `CNAME`, `.nojekyll`, `robots.txt`, `sitemap.xml`, `site.webmanifest` | GitHub Pages / SEO / PWA config. |
 | `404.html` | Branded `noindex` not-found page (GitHub Pages serves it automatically). |
+| `accessibility.html` | Public accessibility statement (WCAG 2.1 AA target); linked from the footer + sitemap. |
 | `favicon*.png/.ico`, `apple-touch-icon.png`, `preview.png` | Icons + social preview image. |
 | `LICENSE` | MIT (the app). liblouis has its own LICENSE under `vendor/liblouis/`. |
 
@@ -134,6 +135,12 @@ Chrome (Puppeteer)** in a scratch dir: load the page over HTTP, assert
 `to the store`→`⠞⠕ ⠮ ⠌⠕⠗⠑`, `ABCDE`→`⠠⠠⠁⠃⠉⠙⠑`), exercise toggles/help/exports,
 and assert **no console/page errors**. Reproduce by `npm i puppeteer` in a temp
 folder, serve the repo, and script `page.evaluate`. Don't add node_modules to this repo.
+
+**Accessibility** was verified with **axe-core** (via `puppeteer-core` driving the
+installed Chrome) across base / help-modal-open / dot-pattern / ADA-mode states —
+**0 violations** on WCAG 2.1 A/AA + best-practice. Re-run after UI changes (install
+`puppeteer-core` + `axe-core` in a temp dir, `axe.run` in `page.evaluate`). The site
+targets WCAG 2.1 AA; keep it at zero axe violations.
 
 ## State / history
 
