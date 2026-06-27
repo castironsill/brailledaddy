@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BrailleDaddy's accessibility statement: our commitment to WCAG 2.1 Level AA, the measures we take, known limitations, and how to report an accessibility issue.">
+    <meta name="theme-color" content="#00d4ff">
+    <meta name="color-scheme" content="dark light">
+    <title>Accessibility Statement — BrailleDaddy</title>
+    <link rel="canonical" href="https://brailledaddy.com/accessibility.html">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="32x32">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .doc-page { max-width: 820px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+        .doc-page h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 2px; margin-bottom: 0.5rem; }
+        .doc-page h2 { font-size: 1.3rem; font-weight: 400; color: var(--accent); margin: 2rem 0 0.75rem; }
+        .doc-page p, .doc-page li { color: var(--text-secondary); line-height: 1.7; }
+        .doc-page ul { margin: 0.5rem 0 0.5rem 1.5rem; }
+        .doc-page a { color: var(--accent); text-decoration: underline; }
+        .doc-page a:hover { text-decoration: none; }
+        .doc-back { display: inline-block; margin-bottom: 1.5rem; }
+        .doc-updated { color: var(--text-secondary); font-size: 0.9rem; margin-top: 2.5rem; font-style: italic; }
+        .doc-page strong { color: var(--text-primary); }
+    </style>
+</head>
+<body>
+    <a href="#docMain" class="skip-link">Skip to content</a>
+    <main id="docMain" class="doc-page">
+        <a href="/" class="doc-back">&larr; Back to the translator</a>
+        <h1>Accessibility Statement</h1>
+        <p>BrailleDaddy is a tool for creating accessible braille signage, so accessibility of
+        the tool itself is a priority for us. We want everyone — including people who use
+        screen readers, keyboard navigation, magnification, or other assistive technology — to
+        be able to use it.</p>
+
+        <h2>Conformance status</h2>
+        <p>BrailleDaddy is designed and tested to conform to the
+        <a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener noreferrer">Web
+        Content Accessibility Guidelines (WCAG) 2.1</a> at <strong>Level AA</strong> — the
+        standard used for ADA web accessibility. We are not currently aware of any outstanding
+        Level AA issues. Accessibility is an ongoing effort and we continue to test and improve.</p>
+
+        <h2>Measures we take</h2>
+        <ul>
+            <li>Semantic HTML landmarks, headings, and a "skip to content" link.</li>
+            <li>Full keyboard operability, with a visible focus indicator on every control.</li>
+            <li>Dialogs that move focus in, trap focus, close on <kbd>Esc</kbd>, and return focus on close.</li>
+            <li>Text alternatives and ARIA labels for controls; decorative icons hidden from assistive tech.</li>
+            <li>Live regions that announce translation results and engine status.</li>
+            <li>Colour contrast meeting WCAG AA, and support for <strong>reduced-motion</strong> preferences.</li>
+            <li>Automated testing with axe-core plus manual review across the app's main states.</li>
+        </ul>
+
+        <h2>Technical specifications</h2>
+        <p>BrailleDaddy relies on HTML, CSS, JavaScript, and WAI-ARIA. It runs entirely in your
+        browser; no account or network connection is required and your text never leaves your
+        device. JavaScript must be enabled for translation.</p>
+
+        <h2>Known limitations</h2>
+        <ul>
+            <li>The <strong>dot-pattern view</strong> is a visual aid; the same translation is always
+            available as text in the Braille Output region, which assistive technology can read.</li>
+            <li>Grade&nbsp;2 <strong>back-translation</strong> (when importing BRF) is inherently
+            approximate for some words.</li>
+            <li>We test with current versions of major browsers and screen readers; behaviour on
+            older or less common assistive technology may vary.</li>
+        </ul>
+
+        <h2>Feedback</h2>
+        <p>If you encounter an accessibility barrier, please tell us — your feedback helps us fix
+        it. You can open an issue on our
+        <a href="https://github.com/castironsill/brailledaddy/issues" target="_blank" rel="noopener noreferrer">GitHub
+        repository</a>. We aim to respond promptly.</p>
+
+        <p class="doc-updated">This statement was last reviewed in June 2026.</p>
+    </main>
+</body>
+</html>

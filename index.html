@@ -238,7 +238,7 @@
                     <button class="view-btn" aria-pressed="false" onclick="toggleView('dots', this)">Dot Pattern</button>
                 </div>
                 <div id="engineStatus" class="engine-status" role="status" aria-live="polite" style="display: none;"></div>
-                <div id="brailleOutput" class="braille-display" aria-live="polite" aria-label="Braille translation output"></div>
+                <div id="brailleOutput" class="braille-display" role="region" aria-live="polite" aria-label="Braille translation output"></div>
                 <canvas id="dotsCanvas" class="dots-display" role="img" aria-label="Visual dot-pattern rendering of the braille translation. The same translation is available as text in the Braille translation output above." style="display: none;"></canvas>
             </div>
         </div>
@@ -380,6 +380,7 @@
                 <h2>Resources</h2>
                 <ul>
                     <li><button type="button" class="link-button" onclick="openHelpModal()">Help &amp; ADA braille guide</button></li>
+                    <li><a href="/accessibility.html">Accessibility statement</a></li>
                     <li><a href="https://github.com/castironsill/brailledaddy" target="_blank" rel="noopener">Source code on GitHub</a></li>
                     <li><a href="https://www.access-board.gov/ada/guides/chapter-7-signs/" target="_blank" rel="noopener noreferrer">U.S. Access Board — ADA signs</a></li>
                 </ul>
