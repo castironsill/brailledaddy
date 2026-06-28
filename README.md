@@ -5,6 +5,9 @@
 ![UEB](https://img.shields.io/badge/UEB-Grade%201%20%26%202-brightgreen.svg)
 ![Engine](https://img.shields.io/badge/engine-liblouis-blueviolet.svg)
 ![ADA Compliant](https://img.shields.io/badge/ADA-Compliant-blue.svg)
+![WCAG 2.1 AA](https://img.shields.io/badge/WCAG%202.1-AA-success.svg)
+
+🔗 **Live:** <https://brailledaddy.com>
 
 ---
 
@@ -26,11 +29,20 @@ As of **v1.2.0**, translation is powered by **[liblouis](https://github.com/libl
 - Intelligent handling of contractions, numbers, punctuation, and capitalization
 - Special rules for permanent signage vs. documents
 
+### 🪧 ADA Sign Mode
+- One toggle that applies the rules for braille on permanent tactile signs
+  (**ADA §703.3.1 / CBC 11B-703.3**): forces contracted **Grade 2** and **omits
+  capital indicators** — the uppercase/Title-Case styling on a sign's printed face
+  is *not* carried into the braille
+- **Keep-capitals exceptions list:** add proper nouns, names, initials, or acronyms
+  (e.g. `Smith`, `ATM`) and only those keep their capital indicator; matching is
+  case-insensitive and the list entry sets the exact casing
+- See [the capitalization rules](#-ada-compliance) below for the full rationale
+
 ### 👁️ Visualization
 - **Unicode View:** Standard braille characters (⠀–⣿)
-- **Dot Pattern View:** Visual 6-dot cell layout with precise spacing
-- Fullscreen mode for detailed verification
-- High-DPI support
+- **Dot Pattern View:** polished, proportional 6-dot cell rendering that re-wraps
+  on resize and stays crisp on High-DPI / Retina displays
 
 ### 📥 Import & Export
 
@@ -58,10 +70,20 @@ Built-in compliance with **ADA §703.3.1** for permanent room identification:
 | **Dot height** | 0.6–0.9mm raised |
 | **Grade requirement** | Grade 2 mandatory for permanent signs |
 
-**Special capitalization rules for signs:**
-- Tactile text: ALL CAPS (required)
-- Braille: NO capital indicators for first word (implied as title)
-- Exception: DO capitalize proper nouns, initials, acronyms
+**Special capitalization rules for signs (handled by ADA Sign Mode):**
+
+Per ADA §703.3.1 / California Building Code 11B-703.3, a capital indicator
+"shall only be used before the first word of sentences, proper nouns and names,
+individual letters of the alphabet, initials, and acronyms." Capitalization on
+braille signage is **optional**, and the ALL-CAPS or Title-Case styling on the
+printed face of a sign must **not** be reproduced as capital indicators in the
+braille.
+
+- **Tactile (raised) text:** ALL CAPS — required by §703.2.2
+- **Braille:** capital indicators omitted by default; turn on **ADA Sign Mode**
+  and the translator does this for you (and forces Grade 2)
+- **Exception:** use the keep-capitals list to retain caps on proper nouns,
+  names, initials, and acronyms
 
 ---
 
@@ -76,6 +98,18 @@ tables, so the output now matches professional transcription tools. The BRF
 import/export was also rebuilt on the standard Braille ASCII table, and the
 in-page accessibility was improved (visible keyboard focus, ARIA labelling,
 reduced-motion support).
+
+### Since v1.2.0
+
+- **ADA Sign Mode** with a per-term keep-capitals exceptions list (see above)
+- **Dot-pattern view redesigned** — proportional geometry, High-DPI rendering,
+  reflows correctly on resize
+- **Accessibility hardened to WCAG 2.1 AA** — accessible dialogs with focus
+  management/trap/Escape, skip link, labelled controls, decorative icons hidden;
+  **0 violations** under axe-core across the app's main states. Published
+  [accessibility statement](https://brailledaddy.com/accessibility.html)
+- **SEO pass** — richer metadata, `WebApplication` + `FAQPage` structured data,
+  descriptive footer, branded 404 page
 
 ---
 
@@ -101,9 +135,13 @@ over HTTP instead, e.g. `python -m http.server` and open <http://localhost:8000>
 
 - **Vanilla JavaScript** UI — no framework, no build step
 - **Translation by [liblouis](https://github.com/liblouis/liblouis)** (LGPLv3), compiled to JavaScript and vendored under [`vendor/liblouis/`](vendor/liblouis/) along with the official UEB tables (inlined so the app runs offline, with no network request)
-- **Canvas rendering** for the dot-pattern view
+- **Canvas rendering** for the dot-pattern view (High-DPI aware, resize-reflowing)
 - **Responsive design** using CSS Grid
-- **Accessible**: visible keyboard focus, ARIA labelling, and `prefers-reduced-motion` support
+- **Accessible — targets WCAG 2.1 Level AA**: semantic landmarks, skip link,
+  full keyboard operability with visible focus, accessible dialogs (focus
+  move-in/trap/Escape/restore), ARIA labelling, live regions, and
+  `prefers-reduced-motion` support. Verified at **0 axe-core violations**; see the
+  [accessibility statement](accessibility.html)
 
 > To update the bundled tables after editing `vendor/liblouis/tables/`, run `node tools/gen-tables.js`. Local modifications to the vendored engine are documented in [`vendor/liblouis/PATCHES.md`](vendor/liblouis/PATCHES.md).
 
@@ -129,7 +167,9 @@ over HTTP instead, e.g. `python -m http.server` and open <http://localhost:8000>
 ✅ Dots must be domed/rounded (not flat)
 
 ❌ **Do NOT** use all capitals in braille for emphasis  
-❌ **Do NOT** add capital indicators to first word in sign braille
+❌ **Do NOT** mirror the sign's printed ALL-CAPS / Title-Case in the braille — omit
+capital indicators except for proper nouns, names, individual letters, initials,
+and acronyms (ADA Sign Mode does this automatically)
 
 ---
 
