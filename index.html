@@ -695,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="grade-comparison">
                         <h5>Characteristics:</h5>
                         <ul>
-                            <li>Uses 189 contractions and short forms</li>
+                            <li>Uses about 180 contractions and short forms</li>
                             <li>More compact—saves about 25% space</li>
                             <li>Standard for books and longer documents</li>
                             <li>Requires learning contraction rules</li>
@@ -768,26 +768,29 @@ document.addEventListener('DOMContentLoaded', function() {
                         <h5>1. Whole Word Contractions</h5>
                         <p>Some contractions only work when the word stands alone:</p>
                         <ul>
-                            <li><strong>✓ Correct:</strong> "I <span class="highlight">can</span> help" → ⠊ ⠉ ⠓⠑⠇⠏</li>
+                            <li><strong>✓ Correct:</strong> "I <span class="highlight">can</span> help" → ⠠⠊ ⠉ ⠓⠑⠇⠏</li>
                             <li><strong>✗ Incorrect:</strong> Using 'c' contraction in "scan" or "candle"</li>
                         </ul>
                     </div>
                     
                     <div class="rule-section">
-                        <h5>2. The "to" Contraction Debate</h5>
-                        <p>You noticed BrailleBlaster spells out "to" while we contract it. Both can be correct!</p>
+                        <h5>2. "to", "into" and "by" are written out in UEB</h5>
+                        <p>Older English Braille (EBAE) joined "to", "into" and "by" to the
+                        following word. UEB removed those wordsigns, so each is now spelled in full:</p>
                         <ul>
-                            <li>UEB allows "to" to be contracted (⠞) in most cases</li>
-                            <li>Some contexts or preferences may spell it out (⠞⠕)</li>
-                            <li>Certain sequences like "to the" may influence the choice</li>
+                            <li>"to" → ⠞⠕ (the letters t-o)</li>
+                            <li>"into" → ⠔⠞⠕ (the "in" groupsign + t-o)</li>
+                            <li>"by" → ⠃⠽ (the letters b-y)</li>
                         </ul>
+                        <p>BrailleDaddy uses the liblouis engine — the same one behind BrailleBlaster
+                        and most professional braille software — so its output follows these UEB rules.</p>
                     </div>
-                    
+
                     <div class="rule-section">
                         <h5>3. Groupsigns Within Words</h5>
                         <p>Letter combinations can be contracted within longer words:</p>
                         <ul>
-                            <li>"out" → ⠳ (can be used in "outside" → ⠳⠎⠊⠙⠑)</li>
+                            <li>"ou" → ⠳ (used inside words, e.g. "outside" → ⠳⠞⠎⠊⠙⠑; standing alone, ⠳ is also the word "out")</li>
                             <li>"ing" → ⠬ (can be used in "playing" → ⠏⠇⠁⠽⠬)</li>
                         </ul>
                     </div>
@@ -971,19 +974,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <h4>Why Doesn't My Translation Match Another Tool?</h4>
                     <div class="troubleshoot-section">
-                        <p>Small differences between braille translation tools are normal. Here's why:</p>
+                        <p>BrailleDaddy translates with <strong>liblouis</strong> — the same open-source
+                        engine used by BrailleBlaster and most professional braille software — so its
+                        output should closely match those tools. When small differences do appear, it's
+                        usually because:</p>
                         <ul>
-                            <li><strong>Different rules interpretations:</strong> Some UEB rules have flexibility (like "to" contraction)</li>
-                            <li><strong>Version differences:</strong> Tools may use different versions of UEB rules</li>
-                            <li><strong>Context handling:</strong> Tools analyze context differently for contractions</li>
-                            <li><strong>Our approach:</strong> We follow standard UEB rules with common interpretations</li>
+                            <li><strong>Version / table differences:</strong> tools may use different liblouis versions or UEB table revisions</li>
+                            <li><strong>Genuinely optional choices:</strong> a few UEB decisions are discretionary, so equally-correct outputs can differ</li>
+                            <li><strong>Input differences:</strong> capitalization, spacing, and punctuation in the source text change the result</li>
                         </ul>
-                        
+
                         <div class="example-box">
-                            <h5>Example: "to" handling</h5>
-                            <p><strong>BrailleDaddy:</strong> ⠞ (contracted)</p>
-                            <p><strong>Some tools:</strong> ⠞⠕ (uncontracted)</p>
-                            <p class="example-breakdown">Both are valid depending on context!</p>
+                            <h5>Tip: capitalization changes the braille</h5>
+                            <p><strong>Main office:</strong> ⠠⠍⠁⠔ ⠷⠋⠊⠉⠑</p>
+                            <p><strong>MAIN OFFICE:</strong> ⠠⠠⠍⠁⠔ ⠠⠠⠷⠋⠊⠉⠑</p>
+                            <p class="example-breakdown">All-caps adds a capitalised-word indicator (⠠⠠) before each word — avoid it on ADA signs.</p>
                         </div>
                     </div>
                     
@@ -1067,7 +1072,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <strong>Stairway:</strong>
                             <p>Text: Stairway</p>
                             <p>Grade 2: ⠠⠌⠁⠊⠗⠺⠁⠽</p>
-                            <p class="note-box">Note: "st" and "ar" contractions used</p>
+                            <p class="note-box">Note: "st" contraction used; "air" is written out</p>
                         </div>
                     </div>
                     
