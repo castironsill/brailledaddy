@@ -331,9 +331,17 @@ function drawDotPattern() {
     // In fullscreen the canvas is forced to 100vw by CSS (!important), so size
     // the bitmap to the viewport; otherwise track the panel width.
     const inFullscreen = canvas.classList.contains('fullscreen');
+
+    // Measure the available width from the canvas's own laid-out box — CSS gives
+    // it width:100% of the panel's content area. Clear any stale inline width
+    // first so the read reflects the container, not the previous draw. Sizing
+    // from parentElement.offsetWidth (which includes the panel's padding) made
+    // the canvas overflow its grid column; with 1fr tracks the column then grew
+    // on every keystroke (canvas creeping wider, input shrinking).
+    if (!inFullscreen) canvas.style.removeProperty('width');
     const width = inFullscreen
         ? Math.max(320, window.innerWidth - 64)
-        : (canvas.parentElement.offsetWidth || 600);
+        : (canvas.clientWidth || canvas.parentElement.clientWidth || 600);
 
     const dpr = window.devicePixelRatio || 1;
 
@@ -345,7 +353,7 @@ function drawDotPattern() {
             canvas.style.removeProperty('width');
             canvas.style.removeProperty('height');
         } else {
-            canvas.style.width = w + 'px';
+            // Width stays governed by CSS (width:100%); only pin the height.
             canvas.style.height = h + 'px';
         }
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // reset + apply HiDPI scale

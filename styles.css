@@ -267,7 +267,10 @@ label {
 /* ---- Translation panels --------------------------------------------------- */
 .translation-area {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* minmax(0, 1fr) lets each column shrink below its content's intrinsic
+       width. Plain 1fr keeps a min-content floor, so an oversized canvas could
+       inflate its track and starve the other column. */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 1.5rem;
     flex: 1;
 }
@@ -372,6 +375,8 @@ textarea:focus {
 
 .dots-display {
     width: 100%;
+    max-width: 100%;
+    display: block;
     background-color: var(--bg-tertiary);
     border: 1px solid var(--border-strong);
     border-radius: 8px;
