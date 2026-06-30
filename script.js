@@ -388,7 +388,7 @@ function drawDotPattern() {
             // Subtle cell plate for structure.
             const pad = DOT_R + 3;
             roundRect(ctx, ox - pad, oy - pad, CELL_W + 2 * pad, CELL_H + 2 * pad, 6);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+            ctx.fillStyle = 'rgba(27, 35, 48, 0.03)';
             ctx.fill();
 
             const active = new Set(brailleDots(ch));
@@ -400,7 +400,7 @@ function drawDotPattern() {
                 if (active.has(d)) {
                     // Soft glow.
                     const grad = ctx.createRadialGradient(x, y, 0, x, y, DOT_R * 2.6);
-                    grad.addColorStop(0, hexToRgba(accent, 0.55));
+                    grad.addColorStop(0, hexToRgba(accent, 0.16));
                     grad.addColorStop(1, hexToRgba(accent, 0));
                     ctx.fillStyle = grad;
                     ctx.beginPath();
@@ -414,13 +414,13 @@ function drawDotPattern() {
                     ctx.fill();
 
                     // Highlight for a raised, tactile look.
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
                     ctx.beginPath();
                     ctx.arc(x - DOT_R * 0.3, y - DOT_R * 0.3, DOT_R * 0.32, 0, Math.PI * 2);
                     ctx.fill();
                 } else {
                     // Faint placeholder so empty positions read as part of the cell.
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+                    ctx.fillStyle = 'rgba(27, 35, 48, 0.18)';
                     ctx.beginPath();
                     ctx.arc(x, y, DOT_R * 0.5, 0, Math.PI * 2);
                     ctx.fill();
@@ -447,7 +447,7 @@ function hexToRgba(hex, alpha) {
     hex = (hex || '').replace('#', '').trim();
     if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
     const n = parseInt(hex, 16);
-    if (hex.length !== 6 || isNaN(n)) return 'rgba(0, 212, 255, ' + alpha + ')';
+    if (hex.length !== 6 || isNaN(n)) return 'rgba(29, 90, 146, ' + alpha + ')';
     return 'rgba(' + ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255) + ', ' + alpha + ')';
 }
 

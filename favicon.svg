@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="BrailleDaddy">
+  <rect width="64" height="64" rx="15" fill="#1d5a92"></rect>
+  <g fill="none" stroke="#ffffff" stroke-width="2.4" opacity="0.32">
+    <circle cx="24" cy="46" r="6.5"></circle>
+    <circle cx="42" cy="18" r="6.5"></circle>
+    <circle cx="42" cy="32" r="6.5"></circle>
+    <circle cx="42" cy="46" r="6.5"></circle>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="24" cy="18" r="7"></circle>
+    <circle cx="24" cy="32" r="7"></circle>
+  </g>
+</svg>
