@@ -522,6 +522,14 @@ function toggleFullscreen(elementId) {
         // Remove close button
         const closeBtn = element.parentElement.querySelector('.fullscreen-close');
         if (closeBtn) closeBtn.remove();
+
+        // The dots canvas drops its inline sizing while fullscreen (so the
+        // !important fullscreen CSS can govern). Redraw once the panel has
+        // reflowed so the canvas re-fits its container instead of keeping the
+        // oversized fullscreen bitmap (which otherwise renders shrunken).
+        if (elementId === 'dotsCanvas') {
+            setTimeout(() => drawDotPattern(), 100);
+        }
     } else {
         // Enter fullscreen
         element.classList.add('fullscreen');
