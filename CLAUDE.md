@@ -129,8 +129,15 @@ inherently approximate for some words — that's expected.)
 
 ## Verifying changes (how this was tested)
 
-There's no test suite in-repo. Engine/UI changes were verified with **headless
-Chrome (Puppeteer)** in a scratch dir: load the page over HTTP, assert
+**Engine tests are committed** in `tests/` — dependency-free (Node's built-in
+runner + a `vm` sandbox that loads the vendored liblouis bundle headlessly). Run
+`node --test` from the repo root (Node 18+). They assert known-good UEB Grade 1/2
+translations, multi-line handling, and BRF back-translation; run them after any
+engine, table, or `braille-engine.js` change. Reuse `tests/helpers/load-engine.js`
+to add cases. **No `node_modules` — keep this suite zero-dependency.**
+
+UI/interaction and accessibility still need a browser and are verified with
+**headless Chrome (Puppeteer)** in a scratch dir: load the page over HTTP, assert
 `BrailleEngine.ready`, check known translations (e.g. `the cat`→`⠮ ⠉⠁⠞`,
 `to the store`→`⠞⠕ ⠮ ⠌⠕⠗⠑`, `ABCDE`→`⠠⠠⠁⠃⠉⠙⠑`), exercise toggles/help/exports,
 and assert **no console/page errors**. Reproduce by `npm i puppeteer` in a temp
