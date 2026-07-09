@@ -558,6 +558,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Register the service worker so the installed PWA (and a plain browser tab)
+// keeps working with no network. Guarded on http/https: service workers are
+// unavailable on file://, which this app also supports.
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js').catch(function (err) {
+            // Offline support is a progressive enhancement — never break the app.
+            console.warn('Service worker registration failed:', err);
+        });
+    });
+}
 </script>
 
 <!-- Help Modal -->
