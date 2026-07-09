@@ -5,16 +5,18 @@
 // and runs offline. Translation itself never touched the network — but until
 // now the page still had to be fetched to start.
 //
+// The app has no third-party requests at all (the brand font is self-hosted),
+// so everything it needs is same-origin and precacheable.
+//
 // Strategies:
 //   navigations      -> network-first, fall back to the cached page (offline)
 //   same-origin GET  -> stale-while-revalidate (instant, self-healing on deploy)
-//   Google Fonts     -> cache-first (they are immutable, versioned URLs)
 //
 // Bump CACHE_VERSION to force a clean re-precache. Note that
 // stale-while-revalidate already picks up changed assets on the next visit, so
 // a bump is only needed when the precache LIST itself changes.
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const PRECACHE = `brailledaddy-precache-${CACHE_VERSION}`;
 const RUNTIME = `brailledaddy-runtime-${CACHE_VERSION}`;
 
@@ -28,6 +30,7 @@ const PRECACHE_URLS = [
   '/vendor/liblouis/easy-api.js',
   '/vendor/liblouis/tables.js',
   '/vendor/liblouis/braille-engine.js',
+  '/fonts/hanken-grotesk-800-latin.woff2',
   '/accessibility.html',
   '/site.webmanifest',
   '/favicon.svg',
@@ -35,8 +38,6 @@ const PRECACHE_URLS = [
   '/apple-touch-icon.png',
   '/icon-512.png'
 ];
-
-const FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -62,22 +63,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-
-  // Immutable, versioned font files: serve from cache, fetch once if missing.
-  if (FONT_HOSTS.includes(url.hostname)) {
-    event.respondWith(
-      caches.match(request).then((cached) =>
-        cached || fetch(request).then((response) => {
-          const copy = response.clone();
-          caches.open(RUNTIME).then((cache) => cache.put(request, copy));
-          return response;
-        }).catch(() => cached) // offline and never cached: let it fail soft
-      )
-    );
-    return;
-  }
-
-  if (url.origin !== self.location.origin) return; // leave other hosts alone
+  if (url.origin !== self.location.origin) return; // nothing third-party to handle
 
   // Page loads: prefer the network so deploys land immediately, but fall back
   // to the cached shell when there is no connection.

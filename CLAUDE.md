@@ -38,6 +38,7 @@ engraving/embossing), BRF (for embossers), and plain text, plus TXT/BRF import.
 | `tools/gen-tables.js` | Regenerates `vendor/liblouis/tables.js` from the table source files. Run `node tools/gen-tables.js` after editing tables. |
 | `README.md` | Public-facing project readme. |
 | `CNAME`, `.nojekyll`, `robots.txt`, `sitemap.xml`, `site.webmanifest` | GitHub Pages / SEO / PWA config. The manifest's 512px icon is what makes Chrome offer "Install app". |
+| `fonts/` | Self-hosted brand font (`hanken-grotesk-800-latin.woff2`, SIL OFL 1.1 — keep `OFL.txt`). Declared via `@font-face` at the top of `styles.css`. **The app must make zero third-party requests** — don't reintroduce a Google Fonts `<link>`. Only weight 800/latin is used (the header wordmark). |
 | `sw.js` | Service worker: pre-caches the app shell + liblouis engine so the installed PWA works with no network. Registered from `index.html` (guarded — skipped on `file://`). Navigations are network-first; assets stale-while-revalidate. **If you add/rename a shell file, update `PRECACHE_URLS` — one 404 makes `cache.addAll()` fail entirely.** |
 | `404.html` | Branded `noindex` not-found page (GitHub Pages serves it automatically). |
 | `accessibility.html` | Public accessibility statement (WCAG 2.1 AA target); linked from the footer + sitemap. |
